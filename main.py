@@ -2,6 +2,7 @@ import socket, re, os
 from views import *
 
 URLS = {
+    '/favicon.ico': ico,
     '/': index,
     '/blog': blog
 }
@@ -9,7 +10,7 @@ URLS = {
 
 def get_static_file(url):
     with open(url[1:]) as file:
-        return file.read()
+        return file.read().encode()
 
 
 def parse_request(request):
@@ -41,10 +42,10 @@ def generate_content(code, url):
 
 def generate_response(request):
     method, url = parse_request(request)
-    headers, code = generate_headers(method, url)
+    headers, code = generate_headers(method, url).encode()
     body = generate_content(code, url)
     
-    return (headers + body).encode()
+    return headers + body
 
 
 def run():
