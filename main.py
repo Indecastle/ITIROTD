@@ -1,10 +1,13 @@
 import socket, re, os
 from views import *
+from urllib3 import HTTPResponse
+import requests;
 
 URLS = {
     '/favicon.ico': ico,
     '/': index,
-    '/blog': blog
+    '/blog': blog,
+    '/chat': chat
 }
 
 
@@ -31,21 +34,25 @@ def generate_headers(method, url):
 
 
 def generate_content(code, url):
-    if code == 404:
-        return '<h1>404</h1><p>Not found</p>'
-    if code == 405:
-        return '<h1>405</h1><p>Method not allowed</p>'
-    if re.match(r'^/static', url):
-        return get_static_file(url)
-    return URLS[url]()
+    try:
+        if code == 404:
+            return b'<h1>404</h1><p>Not found</p>'
+        if code == 405:
+            return b'<h1>405</h1><p>Method not allowed</p>'
+        if re.match(r'^/static', url):
+            return get_static_file(url)
+        return URLS[url]()
+    except Exception as e:
+        print(e)
+        return f"<h1>{e}</h1>".encode()
 
 
 def generate_response(request):
     method, url = parse_request(request)
-    headers, code = generate_headers(method, url).encode()
+    headers, code = generate_headers(method, url)
     body = generate_content(code, url)
     
-    return headers + body
+    return headers.encode() + body
 
 
 def run():
@@ -53,21 +60,22 @@ def run():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind(('localhost', 5000))
     server_socket.listen()
+    print("Run server...")
 
     while True:
         client_socket, addr = server_socket.accept()
         request = client_socket.recv(1024)
         print('=====request======')
-        print(request)
-        #print()
+        print(request.decode('utf-8'))
+        print()
         print(addr)
         print('=====request end======')
 
         if request != b'':
             response = generate_response(request.decode('utf-8'))
-            print('=====response======')
-            print(response)
-            print('=====response end======\n')
+            #print('=====response======')
+            #print(response)
+            #print('=====response end======\n')
 
             client_socket.sendall(response)
         client_socket.close()
