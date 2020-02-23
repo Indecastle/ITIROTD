@@ -26,19 +26,29 @@ def render_template(file, **kwargs):
 args['render_template'] = render_template
 
 
-def index():
+def my_error(code):
+    kwargs = {'code': code, 'message': 'Error'}
+    if code == 404:
+        kwargs['message'] = "Not Found"
+    elif code == 405:
+        kwargs['message'] = "Method not allowed"
+    return render_template('shared/Error.html', **kwargs).encode()
+
+
+def index(request):
+    request.response.headers['kek'] = 'lol'
     kwargs = {'time': time, 'debug_start_time': time.time()}
     return render_template('templates/index.html', **kwargs).encode()
 
 
-def blog():
+def blog(request):
     return render_template('templates/blog.html').encode()
 
 
-def ico():
+def ico(request):
     with open('sun.ico', 'rb') as template:
         return template.read()
 
-def chat():
+def chat(request):
     kwargs = {}
     return render_template('templates/chat.html', **kwargs).encode()

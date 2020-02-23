@@ -1,7 +1,9 @@
-import socket, re, os
+import socket, re, os, json
+from socketserver import ThreadingMixIn
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from cgi import parse_header, parse_multipart
+from urllib.parse import parse_qs, urlsplit
 from views import *
-from urllib3 import HTTPResponse
-import requests;
 
 URLS = {
     '/favicon.ico': ico,
@@ -16,71 +18,117 @@ def get_static_file(url):
         return file.read().encode()
 
 
-def parse_request(request):
-    parsed = request.split(' ')
-    method = parsed[0]
-    url = parsed[1]
-    return method, url
+def generate_headers(request, method, url):
+    code = 200
+    content_type = "text/html"
+    if method not in ('GET', 'POST'):
+        code = 405
+    elif re.match(r'^/static', url):
+        if os.path.isfile(url[1:]):
+            r = re.match(r'^/static/(\w+)/', url)
+            if r is not None:
+                content_type_folder = r.group(1)
+                content_type = 'text/' + content_type_folder
+            else:
+                content_type = 'text/plain'
+        else:
+            code = 404
+    else:
+        if url not in URLS:
+            code = 404
+
+    request.response.code = code
+    request.response.content_type = content_type
+
+    return code
 
 
-def generate_headers(method, url):
-    if not method == 'GET':
-        return ('HTTP/1.1 405 Method not allowed\n\n', 405)
-
-    if not url in URLS and re.match(r'^/static', url) and not os.path.isfile(url[1:]):
-        return ('HTTP/1.1 404 Not found\n\n', 404)
-
-    return ('HTTP/1.1 200 OK\n\n', 200)
+def generate_content(request, code, url):
+    if code in (404, 405):
+        return my_error(code)  # b'<h1>404</h1><p>Not found</p>'
+    if re.match(r'^/static', url):
+        return get_static_file(url)
+    return URLS[url](request)
 
 
-def generate_content(code, url):
-    try:
-        if code == 404:
-            return b'<h1>404</h1><p>Not found</p>'
-        if code == 405:
-            return b'<h1>405</h1><p>Method not allowed</p>'
-        if re.match(r'^/static', url):
-            return get_static_file(url)
-        return URLS[url]()
-    except Exception as e:
-        print(e)
-        return f"<h1>{e}</h1>".encode()
+def send_headers(request):
+    request.send_response(request.response.code)
+    for k, v in request.response.headers.items():
+        request.send_header(k, v)
+    request.end_headers()
 
 
 def generate_response(request):
-    method, url = parse_request(request)
-    headers, code = generate_headers(method, url)
-    body = generate_content(code, url)
-    
-    return headers.encode() + body
+    method, url = request.command, request.path
+
+    code = generate_headers(request, method, url)
+    body = generate_content(request, code, url)
+
+    send_headers(request)
+    request.wfile.write(body)
+
+
+class Response:
+    def __init__(self, request):
+        self.request = request
+        self.wfile = request.wfile
+        self.send_header = request.send_header
+
+        self.code = 200
+        self.headers = {
+            'content_type': "text/html"
+        }
+
+
+class CustomServer(BaseHTTPRequestHandler):
+    def _init(self):
+        self.response = Response(self)
+
+    def _set_headers(self):
+        self.send_response(200)
+        # self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+    def do_GET(self):
+        self._init()
+        self.parse_query_GET()
+        generate_response(self)
+
+    def do_POST(self):
+        self._init()
+        self._set_headers()
+        postvars = self.parse_POST()
+        json_vars = json.dumps(postvars).encode('utf-8')
+        self.wfile.write(json_vars)
+
+    def parse_POST(self):
+        ctype, pdict = parse_header(self.headers['content-type'])
+        if ctype == 'multipart/form-data':
+            postvars = parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers['content-length'])
+            str = self.rfile.read(length).decode('utf-8')
+            postvars = parse_qs(
+                str,
+                keep_blank_values=1)
+        else:
+            postvars = {}
+        return postvars
+
+    def parse_query_GET(self):
+        self.query = parse_qs(urlsplit(self.path).query)
+        self.path = urlsplit(self.path).path
+
+
+class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+    pass
 
 
 def run():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(('localhost', 5000))
-    server_socket.listen()
-    print("Run server...")
+    server = ThreadingSimpleServer(('localhost', 8000), CustomServer)
+    server.serve_forever()
 
-    while True:
-        client_socket, addr = server_socket.accept()
-        request = client_socket.recv(1024)
-        print('=====request======')
-        print(request.decode('utf-8'))
-        print()
-        print(addr)
-        print('=====request end======')
-
-        if request != b'':
-            response = generate_response(request.decode('utf-8'))
-            #print('=====response======')
-            #print(response)
-            #print('=====response end======\n')
-
-            client_socket.sendall(response)
-        client_socket.close()
-        
-
+print("Run Server...")
 run()
-#url = '/static/js/MyJS.js'
-#print(re.match(r'^/static', url) )
+# url = '/static/js/MyJS.js'
+# print(re.match(r'^/static', url) )

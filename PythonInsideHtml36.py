@@ -1,3 +1,9 @@
+old_open = open
+def uopen(*args, **kwargs):
+    kwargs.setdefault("encoding", "UTF-8")
+    return old_open(*args, **kwargs)
+open = uopen
+
 """
 Copyright (c) 2006 Pierre Quentel (quentel.pierre@wanadoo.fr)
 
