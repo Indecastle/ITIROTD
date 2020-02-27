@@ -4,18 +4,13 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from cgi import parse_header, parse_multipart
 from urllib.parse import parse_qs, urlsplit
 from views import *
-
-URLS = {
-    '/favicon.ico': ico,
-    '/': index,
-    '/blog': blog,
-    '/chat': chat
-}
+from routes import *
+from helper import get_content_type
 
 
 def get_static_file(url):
-    with open(url[1:]) as file:
-        return file.read().encode()
+    with open(url[1:], 'rb') as file:
+        return file.read()
 
 
 def generate_headers(request, method, url):
@@ -25,30 +20,33 @@ def generate_headers(request, method, url):
         code = 405
     elif re.match(r'^/static', url):
         if os.path.isfile(url[1:]):
-            r = re.match(r'^/static/(\w+)/', url)
-            if r is not None:
-                content_type_folder = r.group(1)
-                content_type = 'text/' + content_type_folder
-            else:
-                content_type = 'text/plain'
+            subp = url[8:]
+            content_type = get_content_type(subp)
         else:
             code = 404
     else:
-        if url not in URLS:
+        if method == 'GET' and url not in URLS:
+            code = 404
+        elif method == 'POST' and url not in URLS_POST:
             code = 404
 
     request.response.code = code
     request.response.content_type = content_type
-
     return code
 
 
-def generate_content(request, code, url):
+def generate_content(request, method, code, url):
     if code in (404, 405):
         return my_error(code)  # b'<h1>404</h1><p>Not found</p>'
     if re.match(r'^/static', url):
         return get_static_file(url)
-    return URLS[url](request)
+    else:
+        if url == '/favicon.ico':
+            print(123)
+        if method == 'GET':
+            return URLS[url](request)
+        if method == 'POST':
+            return URLS_POST[url](request)
 
 
 def send_headers(request):
@@ -62,7 +60,7 @@ def generate_response(request):
     method, url = request.command, request.path
 
     code = generate_headers(request, method, url)
-    body = generate_content(request, code, url)
+    body = generate_content(request, method, code, url)
 
     send_headers(request)
     request.wfile.write(body)
@@ -78,6 +76,7 @@ class Response:
         self.headers = {
             'content_type': "text/html"
         }
+        self.POST_query = None
 
 
 class CustomServer(BaseHTTPRequestHandler):
@@ -96,10 +95,10 @@ class CustomServer(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self._init()
-        self._set_headers()
-        postvars = self.parse_POST()
-        json_vars = json.dumps(postvars).encode('utf-8')
-        self.wfile.write(json_vars)
+        self.response.POST_query = self.parse_POST()
+        generate_response(self)
+
+
 
     def parse_POST(self):
         ctype, pdict = parse_header(self.headers['content-type'])
