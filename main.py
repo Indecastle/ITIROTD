@@ -1,4 +1,5 @@
 import socket, re, os, json
+from collections import defaultdict
 from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from cgi import parse_header, parse_multipart
@@ -7,6 +8,7 @@ from views import *
 from routes import *
 from helper import get_content_type
 from chat_websocket import start_asyncio
+from auth import get_auth
 
 
 def get_static_file(url):
@@ -42,8 +44,6 @@ def generate_content(request, method, code, url):
     if re.match(r'^/static', url):
         return get_static_file(url)
     else:
-        if url == '/favicon.ico':
-            print(123)
         if method == 'GET':
             return URLS[url](request)
         if method == 'POST':
@@ -52,14 +52,16 @@ def generate_content(request, method, code, url):
 
 def send_headers(request):
     request.send_response(request.response.code)
-    for k, v in request.response.headers.items():
-        request.send_header(k, v)
+    for k, v_list in request.response.headers.items():
+        for v in v_list:
+            request.send_header(k, v)
     request.end_headers()
 
 
 def generate_response(request):
     method, url = request.command, request.path
 
+    get_auth(request)
     code = generate_headers(request, method, url)
     body = generate_content(request, method, code, url)
 
@@ -74,9 +76,8 @@ class Response:
         self.send_header = request.send_header
 
         self.code = 200
-        self.headers = {
-            'content_type': "text/html"
-        }
+        self.headers = defaultdict(list)
+        self.headers['content_type'].append("text/html")
         self.POST_query = None
 
 

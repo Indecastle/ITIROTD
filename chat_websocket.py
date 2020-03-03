@@ -78,6 +78,7 @@ async def counter(websocket, path):
     nickname = await register(websocket)
     try:
         await websocket.send(event_messages())
+        await websocket.send(event_messages())
         async for message in websocket:
             data = json.loads(message)
             if data["action"] == "send_message":
