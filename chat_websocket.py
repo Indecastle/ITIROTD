@@ -14,8 +14,10 @@ USERS_INFO = []
 MESSAGES = []
 index = 101
 
+
 def find_first(pred, iterable):
     return next(filter(pred, iterable), None)
+
 
 def get_userinfo(websocket):
     return find_first(lambda x: x[0] == websocket, USERS_INFO)
@@ -78,16 +80,15 @@ async def counter(websocket, path):
     nickname = await register(websocket)
     try:
         await websocket.send(event_messages())
-        await websocket.send(event_messages())
         async for message in websocket:
             data = json.loads(message)
             if data["action"] == "send_message":
                 message_info = (data['text'], nickname)
                 MESSAGES.append(message_info)
                 await send_message(message_info)
-            #elif data["action"] == "plus":
+            # elif data["action"] == "plus":
             #    STATE["value"] += 1
-                # await notify_state()
+            # await notify_state()
             else:
                 logging.error("unsupported event: {}", data)
     finally:
@@ -104,6 +105,7 @@ def start_asyncio():
 
     chat_service = threading.Thread(target=run_in_thread)
     chat_service.start()
+
 
 if __name__ == "__main__":
     start_server = websockets.serve(counter, "localhost", 6789)

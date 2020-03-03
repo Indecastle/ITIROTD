@@ -11,20 +11,29 @@ class User:
 
 
 class Session:
-    counter = 1
+    counter = 1001
 
-    def __init__(self):
+    def __init__(self, user):
         self.id = Session.counter
+        self.user = user
         Session.counter += 1
 
 
 USERS = []
+SESSIONS = []
 
 
 def get_auth(request):
-    Cookie = request.headers.get("Cookie")
+    Cookie = request.cookies
     if Cookie is None:
         user = User()
+        session = Session(user)
         USERS.append(user)
-        request.response.headers['Set-Cookie'].append("SessionId=" + str(user.id))
-        request.response.headers['Set-Cookie'].append("SessionId=" + user.nickname)
+        SESSIONS.append(Session(user))
+        request.response.send_cookie('SessionId', str(session.id))
+        request.response.send_cookie('nickname', user.nickname)
+    else:
+        if False:
+            pass
+
+    return 200

@@ -9,6 +9,7 @@ from routes import *
 from helper import get_content_type
 from chat_websocket import start_asyncio
 from auth import get_auth
+from http import cookies
 
 
 def get_static_file(url):
@@ -32,6 +33,8 @@ def generate_headers(request, method, url):
             code = 404
         elif method == 'POST' and url not in URLS_POST:
             code = 404
+        if code == 200:
+            code = get_auth(request)
 
     request.response.code = code
     request.response.content_type = content_type
@@ -61,7 +64,6 @@ def send_headers(request):
 def generate_response(request):
     method, url = request.command, request.path
 
-    get_auth(request)
     code = generate_headers(request, method, url)
     body = generate_content(request, method, code, url)
 
@@ -73,17 +75,23 @@ class Response:
     def __init__(self, request):
         self.request = request
         self.wfile = request.wfile
-        self.send_header = request.send_header
 
         self.code = 200
         self.headers = defaultdict(list)
-        self.headers['content_type'].append("text/html")
+        self.send_header('content_type', 'text/html')
         self.POST_query = None
+
+    def send_header(self, key, value):
+        self.headers[key].append(value)
+
+    def send_cookie(self, key, value):
+        self.send_header('Set-Cookie', f"{key}={value}")
 
 
 class CustomServer(BaseHTTPRequestHandler):
     def _init(self):
         self.response = Response(self)
+        self.parse_cookies()
 
     def _set_headers(self):
         self.send_response(200)
@@ -119,6 +127,12 @@ class CustomServer(BaseHTTPRequestHandler):
     def parse_query_GET(self):
         self.query = parse_qs(urlsplit(self.path).query)
         self.path = urlsplit(self.path).path
+
+    def parse_cookies(self):
+        self.cookies = self.headers['Cookie']
+        if self.cookies is not None:
+            c = cookies.SimpleCookie(self.cookies)
+            self.cookies = dict(map(lambda x: (x.key, x.value), dict(c).values()))
 
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
