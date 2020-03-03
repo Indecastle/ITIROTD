@@ -64,7 +64,7 @@
 	 height: auto;
 	 width: 65%;
 	 border-radius: 5px;
-	 margin: 2em 1em;
+	 margin: 1em 1em;
 	 overflow: auto;
 }
  .chatbox__messages__user-message--ind-message > p.name {

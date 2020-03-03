@@ -29,7 +29,7 @@ def blog(request):
 def blog_POST(request):
     return json.dumps(request.response.POST_query).encode()
 
-
+@route('/chat')
 def chat(request):
     kwargs = {}
     return render_template('templates/chat.html', **kwargs).encode()

@@ -6,6 +6,7 @@ from urllib.parse import parse_qs, urlsplit
 from views import *
 from routes import *
 from helper import get_content_type
+from chat_websocket import start_asyncio
 
 
 def get_static_file(url):
@@ -124,6 +125,8 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 
 def run():
+    start_asyncio()
+
     server = ThreadingSimpleServer(('localhost', 8000), CustomServer)
     server.serve_forever()
 
