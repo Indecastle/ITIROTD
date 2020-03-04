@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSocket demo</title>
+        <style type="text/css">
+            body {
+                font-family: "Courier New", sans-serif;
+                text-align: center;
+            }
+            .buttons {
+                font-size: 4em;
+                display: flex;
+                justify-content: center;
+            }
+            .button, .value {
+                line-height: 1;
+                padding: 2rem;
+                margin: 2rem;
+                border: medium solid;
+                min-height: 1em;
+                min-width: 1em;
+            }
+            .button {
+                cursor: pointer;
+                user-select: none;
+            }
+            .minus {
+                color: red;
+            }
+            .plus {
+                color: green;
+            }
+            .value {
+                min-width: 2em;
+            }
+            .state {
+                font-size: 2em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="buttons">
+            <div class="minus button">-</div>
+            <div class="value">?</div>
+            <div class="plus button">+</div>
+        </div>
+        <div class="state">
+            <span class="users">?</span> online
+        </div>
+        <script>
+            function find_cookie(key) {
+				let cookie = "user=John; path=/index.html; expires=Tue, 19 Jan 2038 03:14:07 GMT".split(';');
+				let find_el = cookie.find((item) => item.trim().startsWith(key + '='));
+				return find_el.split('=', 2)[1]
+			}
+			
+			console.log(find_cookie("path"));
+        </script>
+    </body>
+</html>

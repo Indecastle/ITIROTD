@@ -1,9 +1,18 @@
+function find_cookie(key) {
+    let cookie = document.cookie.split(';');
+    let find_el = cookie.find((item) => item.trim().startsWith(key + '='));
+	if (find_el !== undefined)
+		return find_el.split('=', 2)[1];
+	return undefined;
+}
+
 var user_list = document.querySelector('#user_list'),
 chat_list = document.querySelector('#chat_list'),
 my_form = document.querySelector('#my_form'),
 text_message = document.querySelector('#text_message'),
 websocket = new WebSocket("ws://127.0.0.1:6789/"),
 users = [];
+
 
 my_form.onsubmit = function(event) {
     event.preventDefault();
@@ -59,7 +68,6 @@ websocket.onmessage = function (event) {
             break;
         case 'users':
             users = data.users
-            console.log(users)
             render_users()
             break;
         default:
@@ -67,3 +75,5 @@ websocket.onmessage = function (event) {
                 "unsupported event", data);
     }
 };
+
+websocket.onopen = () => websocket.send(JSON.stringify({action: 'init', nickname: find_cookie("nickname")}));

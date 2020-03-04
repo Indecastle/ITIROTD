@@ -58,20 +58,21 @@ async def send_message(message_info):
 
 
 async def register(websocket):
-    global index
-    nickname = "Nameless_tee" + str(index)
+    message = await websocket.recv();
+    nickname = json.loads(message)["nickname"]
     userinfo = (websocket, nickname)
-    USERS.append(nickname)
+    if nickname not in USERS:
+        USERS.append(nickname)
     USERS_INFO.append(userinfo)
-    index += 1
     await notify_users()
     return nickname
 
 
 async def unregister(websocket):
     user_info = get_userinfo(websocket)
-    USERS.remove(user_info[1])
     USERS_INFO.remove(user_info)
+    if all(x[1] != user_info[1] for x in USERS_INFO):
+        USERS.remove(user_info[1])
     await notify_users()
 
 

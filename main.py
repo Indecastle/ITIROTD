@@ -133,6 +133,8 @@ class CustomServer(BaseHTTPRequestHandler):
         if self.cookies is not None:
             c = cookies.SimpleCookie(self.cookies)
             self.cookies = dict(map(lambda x: (x.key, x.value), dict(c).values()))
+        else:
+            self.cookies = {}
 
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
