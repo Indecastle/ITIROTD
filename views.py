@@ -2,15 +2,7 @@ import time, json
 import PythonInsideHtml36 as pih
 from routes import *
 from render import *
-
-
-def my_error(code):
-    kwargs = {'code': code, 'message': 'Error'}
-    if code == 404:
-        kwargs['message'] = "Not Found"
-    elif code == 405:
-        kwargs['message'] = "Method not allowed"
-    return render_template('shared/Error.html', **kwargs).encode()
+from auth import SESSIONS
 
 
 @route('/')
@@ -27,9 +19,16 @@ def blog(request):
 
 @route('/blog', Method.POST)
 def blog_POST(request):
-    return json.dumps(request.response.POST_query).encode()
+    return json.dumps(request.POST_query).encode()
 
-@route('/chat')
+
+@route('/chat', authorize=Authorize())
 def chat(request):
     kwargs = {}
     return render_template('templates/chat.html', **kwargs).encode()
+
+
+@route('/mytest')
+def test_page(request):
+    SESSIONS.clear()
+    return redirect_to(request, '/')

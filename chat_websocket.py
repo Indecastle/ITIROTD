@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import websockets
+from helper import find_first
 
 logging.basicConfig()
 

@@ -4,13 +4,16 @@ from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from cgi import parse_header, parse_multipart
 from urllib.parse import parse_qs, urlsplit
-from views import *
+from http import cookies
+
+from auth import get_auth
+from error import *
 from routes import *
 from helper import get_content_type
 from chat_websocket import start_asyncio
-from auth import get_auth
-from http import cookies
+import views
 
+import controllers
 
 def get_static_file(url):
     with open(url[1:], 'rb') as file:
@@ -42,8 +45,10 @@ def generate_headers(request, method, url):
 
 
 def generate_content(request, method, code, url):
-    if code in (404, 405):
+    if code in (401, 404, 405):
         return my_error(code)  # b'<h1>404</h1><p>Not found</p>'
+    if code == 301:
+        return redirect_to(request)
     if re.match(r'^/static', url):
         return get_static_file(url)
     else:
@@ -79,19 +84,22 @@ class Response:
         self.code = 200
         self.headers = defaultdict(list)
         self.send_header('content_type', 'text/html')
-        self.POST_query = None
 
     def send_header(self, key, value):
         self.headers[key].append(value)
 
-    def send_cookie(self, key, value):
-        self.send_header('Set-Cookie', f"{key}={value}")
+    def send_cookie(self, key, value, path='/'):
+        self.send_header('Set-Cookie', f"{key}={value}; path={path}")
+
+    def remove_cookie(self, key):  # Set-Cookie: token=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT
+        self.send_header('Set-Cookie', f"{key}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")
 
 
 class CustomServer(BaseHTTPRequestHandler):
     def _init(self):
         self.response = Response(self)
         self.parse_cookies()
+        self.POST_query = None
 
     def _set_headers(self):
         self.send_response(200)
@@ -105,7 +113,8 @@ class CustomServer(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self._init()
-        self.response.POST_query = self.parse_POST()
+        self.POST_query = self.parse_POST()
+        print("POST:", self.POST_query)
         generate_response(self)
 
 
