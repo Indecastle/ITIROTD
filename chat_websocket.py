@@ -79,8 +79,8 @@ async def unregister(websocket):
 
 async def counter(websocket, path):
     # register(websocket) sends user_event() to websocket
-    nickname = await register(websocket)
     try:
+        nickname = await register(websocket)
         await websocket.send(event_messages())
         async for message in websocket:
             data = json.loads(message)

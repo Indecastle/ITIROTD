@@ -47,7 +47,7 @@ def generate_headers(request, method, url):
 def generate_content(request, method, code, url):
     if code in (401, 404, 405):
         return my_error(code)  # b'<h1>404</h1><p>Not found</p>'
-    if code == 301:
+    if code == 302:
         return redirect_to(request)
     if re.match(r'^/static', url):
         return get_static_file(url)
@@ -71,6 +71,8 @@ def generate_response(request):
 
     code = generate_headers(request, method, url)
     body = generate_content(request, method, code, url)
+
+    request.response.send_header('Content-Length', len(body))
 
     send_headers(request)
     request.wfile.write(body)
@@ -96,7 +98,10 @@ class Response:
 
 
 class CustomServer(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
     def _init(self):
+        #self.protocol_version = 'HTTP/1.1'
         self.response = Response(self)
         self.parse_cookies()
         self.POST_query = None
@@ -153,7 +158,7 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 def run():
     start_asyncio()
 
-    server = ThreadingSimpleServer(('localhost', 8000), CustomServer)
+    server = ThreadingSimpleServer(('localhost', 80), CustomServer)
     server.serve_forever()
 
 print("Run Server...")

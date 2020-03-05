@@ -81,7 +81,7 @@ def check_authrole(request):
 
 def get_auth(request):
     if not isvalid_cookie(request):
-        return 301
+        return 302
     if check_authpage(request):
         if check_authrole(request):
             return 200

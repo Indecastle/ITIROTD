@@ -1,7 +1,7 @@
 import PythonInsideHtml36 as pih
 
 args = {
-    'link_for': lambda s: "static/" + s
+    'link_for': lambda s: "../static/" + s
 }
 
 

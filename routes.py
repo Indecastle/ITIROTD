@@ -42,6 +42,14 @@ def route(url, method=Method.GET, authorize=None):
 def redirect_to(request, url=None, method=Method.GET):
     if url is None:
         url = request.path
-    request.response.code = 301
-    request.response.headers['Location'] = url
+
+#     if 'Set-Cookie' in request.response.headers:
+#         return f'''
+#         <head>
+#   <meta http-equiv="refresh" content="0; URL={url}" />
+# </head>
+# '''.encode()
+
+    request.response.code = 302
+    request.response.send_header('Location', url)
     return b''
