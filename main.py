@@ -3,7 +3,7 @@ from collections import defaultdict
 from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from cgi import parse_header, parse_multipart
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlsplit, urlparse
 from http import cookies
 
 from auth import get_auth
@@ -141,6 +141,8 @@ class CustomServer(BaseHTTPRequestHandler):
     def parse_query_GET(self):
         self.query = parse_qs(urlsplit(self.path).query)
         self.path = urlsplit(self.path).path
+        if self.path != '/':
+            self.path = self.path.rstrip('/')
 
     def parse_cookies(self):
         self.cookies = self.headers['Cookie']

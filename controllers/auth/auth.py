@@ -7,7 +7,7 @@ from helper import find_first
 from error import *
 
 
-@route('/auth/login')
+@route('auth')
 def myauth(request, **kwargs):
     kwargs.setdefault('message', '')
     return render_template('templates/auth/login.html', **kwargs).encode()

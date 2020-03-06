@@ -23,8 +23,9 @@ URLS_POST = {}
 def route(url, method=Method.GET, authorize=None):
     # global URLS, URLS_POST
     def actual_decorator(func):
-        if url == '/test':
-            print(url)
+        nonlocal url
+        if url != '/':
+            url = '/' + url.strip('/')
         if method == Method.GET:
             URLS[url] = func
         elif method == Method.POST:
