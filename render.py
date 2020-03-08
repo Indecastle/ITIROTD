@@ -5,17 +5,17 @@ args = {
 }
 
 
-def render_template(file, **kwargs):
+def render_template(request, file, **kwargs):
     template = pih.PIH(file)
     code = template.pythonCode()
 
-    e = {**args}
+    e = {**args, 'request': request}
     e.update(**kwargs)
 
     exec(code, e)
     print(e.keys())
     if 'base' in e:
-        return render_template(e["base"], body=e["py_code"].getvalue())
+        return render_template(request, e["base"], body=e["py_code"].getvalue())
     else:
         return e["py_code"].getvalue()
 

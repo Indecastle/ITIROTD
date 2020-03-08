@@ -12,14 +12,24 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+
 <div class="header">
-    <a href="#default" class="logo">CompanyLogo</a>
+    <a href="/" class="logo">CompanyLogo</a>
     <div class="header-right">
-        <a class="active" href="#home">Home</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
+        <% if request.auth_is: %>
+            <%  user = request.auth_get_user(none='') %>
+            <a class="active" href="/chat">
+                Hello <%= user.nickname %>
+            </a>
+            <a href="/auth/logout">LogOut</a>
+        <% end %>
+        <% else: %>
+            <a href="#contact">Register</a>
+            <a href="/auth/">Login</a>
+        <% end %>
     </div>
 </div>
+
 <div style="padding-left:20px">
     <%= body %>
 </div>
