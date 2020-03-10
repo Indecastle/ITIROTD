@@ -88,3 +88,10 @@
 .container .info span .fa {
   color: #EF3B3A;
 }
+
+.login-form input::placeholder {
+  color: #8b8b8b;
+}
+.register-form input::placeholder {
+  color: #8b8b8b;
+}

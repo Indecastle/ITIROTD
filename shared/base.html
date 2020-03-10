@@ -7,6 +7,7 @@
     <link rel="shortcut icon" href="../static/sun.ico"/>
     <link rel="stylesheet" href="<%= link_for('css/styles.css') %>">
     <link rel="stylesheet" href="../static/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.4.1.js"
             integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
             crossorigin="anonymous"></script>
@@ -14,20 +15,29 @@
 <body>
 
 <div class="header">
+    <a href="javascript:void(0);" class="nav-toggle" onclick="menu_toogle()">
+        <i class="fa fa-bars"></i>
+    </a>
     <a href="/" class="logo">CompanyLogo</a>
-    <div class="header-right">
-        <% if request.auth_is: %>
-            <%  user = request.auth_get_user(none='') %>
-            <a class="active" href="/chat">
-                Hello <%= user.nickname %>
-            </a>
-            <a href="/auth/logout">LogOut</a>
-        <% end %>
-        <% else: %>
-            <a href="#contact">Register</a>
-            <a href="/auth/">Login</a>
-        <% end %>
+    <div class="sub_headers" id="myheader">
+        <div class="header-left">
+            <a href="/">test</a>
+        </div>
+        <div class="header-right" >
+            <% if request.auth_is: %>
+                <% user = request.auth_get_user(none='') %>
+                <a class="/*active*/" href="/chat">
+                    Hello <%= user.nickname %>
+                </a>
+                <a href="/auth/logout">LogOut</a>
+            <% end %>
+            <% else: %>
+                <a href="/auth/">Register</a>
+                <a href="/auth/">Login</a>
+            <% end %>
+        </div>
     </div>
+
 </div>
 
 <div style="padding-left:20px">
