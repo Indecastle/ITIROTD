@@ -136,8 +136,11 @@ class CustomServer(BaseHTTPRequestHandler):
 
 
     def parse_POST(self):
-        ctype, pdict = parse_header(self.headers['content-type'])
+        kek = self.headers['content-type']
+        ctype, pdict = parse_header(kek)
         if ctype == 'multipart/form-data':
+            pdict['boundary'] = pdict['boundary'].encode('ascii')
+            pdict['CONTENT-LENGTH'] = self.headers['content-length']
             postvars = parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])

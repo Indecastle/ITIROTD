@@ -14,7 +14,8 @@ def index(request):
 
 @route('/blog')
 def blog(request):
-    return render_template(request, 'templates/blog.html').encode()
+    kwargs = {'filepath': 'sun.ico'}
+    return render_template(request, 'templates/blog.html', **kwargs).encode()
 
 
 @route('/blog', Method.POST)
@@ -32,3 +33,17 @@ def chat(request):
 def test_page(request):
     SESSIONS.clear()
     return redirect_to(request, request, '/')
+
+@route('/index_POST', Method.POST)
+def blog_POST(request):
+    photo = request.POST_query['photo'][0]
+    import uuid
+    u = uuid.uuid1()
+    filename = 'static/other/' + str(u.hex) + '.jpg'
+    file = open(filename, 'wb')
+    file.write(photo)
+    file.close()
+
+    kwargs = {'filepath': filename}
+
+    return render_template(request, 'templates/blog.html', **kwargs).encode()

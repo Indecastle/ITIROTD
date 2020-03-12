@@ -10,7 +10,10 @@ content_types = {
 
 def get_content_type(path):
     extension = os.path.splitext(path)[1]
-    return content_types[extension]
+    if extension in content_types:
+        return content_types[extension]
+    else:
+        return 'multipart/form-data'
 
 
 def find_first(pred, iterable):
