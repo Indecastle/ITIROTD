@@ -1,2 +1,2 @@
-__all__ = ['auth']
+__all__ = ['auth', 'manage']
 #from .auth import *

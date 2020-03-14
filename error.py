@@ -6,5 +6,6 @@ error_messages = {404: "Page Not Found",
 
 
 def my_error(request, code):
-    kwargs = {'code': code, 'message': error_messages.get(code, "Another ERROR")}
-    return render_template(request, 'shared/Error.html', **kwargs).encode()
+    kwargs = {'code': code, 'message': error_messages.get(code, "Another ERROR"),
+              'base_vars': {'title': 'ERROR'}}
+    return render_template(request, 'shared/Error.html', **kwargs)

@@ -37,8 +37,8 @@ def generate_headers(request, method, url):
             code = 404
         elif method == 'POST' and url not in URLS_POST:
             code = 404
-        if code == 200:
-            code = get_auth(request)
+        code2 = get_auth(request)
+        code = code2 if code == 200 else code
 
     request.response.code = code
     request.response.content_type = content_type
@@ -47,16 +47,16 @@ def generate_headers(request, method, url):
 
 def generate_content(request, method, code, url):
     if code in (401, 404, 405):
-        return my_error(request, code)  # b'<h1>404</h1><p>Not found</p>'
+        return my_error(request, code).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
     if code == 302:
         return redirect_to(request)
     if re.match(r'^/static', url):
         return get_static_file(url)
     else:
         if method == 'GET':
-            return URLS[url](request)
+            return URLS[url](request).encode('utf-8')
         if method == 'POST':
-            return URLS_POST[url](request)
+            return URLS_POST[url](request).encode('utf-8')
 
 
 def send_headers(request):
@@ -111,7 +111,7 @@ class CustomServer(BaseHTTPRequestHandler):
         self.__auth_user = False
 
     def auth_get_user(self, none=None):
-        if self.__auth_user is False:
+        if self.auth_session and self.__auth_user is False:
             user = db.find_user(id=self.auth_session.user_id)
             self.__auth_user = user if user else none
         return self.__auth_user

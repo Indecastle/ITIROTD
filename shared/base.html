@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Title</title>
+    <title>
+        <% title = base_vars.get('title') %>
+        <% if title: %>
+            <%= title %>
+        <% end %>
+        <% else: %>
+            Title
+        <% end %>
+
+
+    </title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="../static/sun.ico"/>
+    <link rel="shortcut icon" href="/static/sun.ico"/>
     <link rel="stylesheet" href="<%= link_for('css/styles.css') %>">
-    <link rel="stylesheet" href="../static/css/auth.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/test.css">
     <script src="https://code.jquery.com/jquery-3.4.1.js"
             integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
             crossorigin="anonymous"></script>
@@ -21,12 +32,12 @@
     <a href="/" class="logo">CompanyLogo</a>
     <div class="sub_headers" id="myheader">
         <div class="header-left">
-            <a href="/">test</a>
+            <a href="/chat">chat</a>
         </div>
         <div class="header-right" >
             <% if request.auth_is: %>
                 <% user = request.auth_get_user(none='') %>
-                <a class="/*active*/" href="/chat">
+                <a class="/*active*/" href="/auth/manage/">
                     Hello <%= user.nickname %>
                 </a>
                 <a href="/auth/logout">LogOut</a>
@@ -40,10 +51,16 @@
 
 </div>
 
-<div style="padding-left:20px">
+<div style="padding-left:20px; height: auto;">
     <%= body %>
 </div>
 
+<footer class="w3-container w3-theme-d3 w3-padding-16">
+  <h5>Footer</h5>
+</footer>
+<footer class="w3-container w3-theme-d5">
+  <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+</footer>
 
 <script src="<%= link_for('js/MyJS.js') %>"></script>
 </body>

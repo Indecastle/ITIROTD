@@ -3,7 +3,7 @@ import json
 from routes import route, Method, redirect_to
 from render import render_template
 from auth import *
-from helper import find_first
+from helper import find_first, save_photo
 from error import *
 from db import create_user, find_user
 
@@ -11,10 +11,10 @@ from db import create_user, find_user
 @route('auth')
 def myauth(request, **kwargs):
     kwargs.setdefault('message', '')
-    return render_template(request, 'templates/auth/login.html', **kwargs).encode()
+    return render_template(request, 'templates/auth/login.html', **kwargs)
 
 
-@route('/auth/login', Method.POST)
+@route('/auth/login', method=Method.POST)
 def myauth_login_POST(request):
     data = request.POST_query
     nickname, password = data["username"][0], data["password"][0]
@@ -28,24 +28,25 @@ def myauth_login_POST(request):
         pass
 
     kwargs = {'message': "Not valid user"}
-    return render_template(request, 'templates/auth/login.html', **kwargs).encode()
+    return render_template(request, 'templates/auth/login.html', **kwargs)
 
 
-@route('/auth/register', Method.POST)
+@route('/auth/register', method=Method.POST)
 def myauth_register_POST(request):
     data = request.POST_query
-    nickname, password, email = data["username"][0], data["password"][0], data['email'][0]
+    nickname, password, email, photodata = data["username"][0], data["password"][0], data['email'][0], data['photopath'][0]
 
     user = find_user(name=nickname)
     if user is None:
-        user_id = create_user(nickname, password)
+        photopath = save_photo(photodata)
+        user_id = create_user(nickname, password, photopath)
         create_session(request, nickname, user_id)
         return redirect_to(request, '/')
     else:
         pass
 
     kwargs = {'message': "Not valid user"}
-    return render_template(request, 'templates/auth/login.html', **kwargs).encode()
+    return render_template(request, 'templates/auth/login.html', **kwargs)
 
 
 @route('/auth/logout')

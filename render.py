@@ -1,7 +1,7 @@
 import PythonInsideHtml36 as pih
 
 args = {
-    'link_for': lambda s: "../static/" + s
+    'link_for': lambda s: "/static/" + s
 }
 
 
@@ -9,13 +9,13 @@ def render_template(request, file, **kwargs):
     template = pih.PIH(file)
     code = template.pythonCode()
 
-    e = {**args, 'request': request}
+    e = {**args, 'request': request, 'base_vars': dict()}
     e.update(**kwargs)
 
     exec(code, e)
     print(e.keys())
     if 'base' in e:
-        return render_template(request, e["base"], body=e["py_code"].getvalue())
+        return render_template(request, e["base"], body=e["py_code"].getvalue(), base_vars=e["base_vars"])
     else:
         return e["py_code"].getvalue()
 

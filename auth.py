@@ -50,7 +50,7 @@ def check_authpage(request):
 
 
 def check_authrole(request, session):
-    user = db.find_user(id=session.user_id)
+    user = request.auth_get_user()
     authorize: Authorize = find_first(lambda a: request.path == a.url, AUTHORIZE)
     if session is not None and authorize is not None:
         if authorize.roles & user.roles or not authorize.roles:

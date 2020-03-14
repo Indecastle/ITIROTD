@@ -2,10 +2,11 @@
 
 <div class="login-page">
     <div class="form">
-        <form class="register-form" action="/auth/register" method="post">
+        <form class="register-form" action="/auth/register" enctype="multipart/form-data" method="post">
             <input type="text" name="username" placeholder="name"/>
             <input type="password" name="password" placeholder="password"/>
             <input type="text" name="email" placeholder="email address"/>
+            <input type="file" name="photopath" multiple accept="image/*,image/jpeg">
             <button>create</button>
             <p class="message">Already registered? <a href="#">Sign In</a></p>
         </form>

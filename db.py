@@ -10,7 +10,8 @@ connection = pymysql.connect(host='192.168.100.5',
                              user='test',
                              password='test',
                              db='ITIROTD',
-                             charset='utf8mb4')
+                             charset='utf8mb4',
+                             autocommit=True)
 
 
 def convert_args_to_querystr(**vargs):
@@ -25,18 +26,19 @@ def execute(request, args=None, limit=None):
         return desc, rows
 
 
-def select_rows(name_table, limit=None, where=''):
-    return execute(f'SELECT * FROM {name_table} {where};', limit=limit)
+def select_rows(name_table, columns='*',  where='', limit=None):
+    return execute(f'SELECT {columns} FROM {name_table} {where};', limit=limit)
 
 
 def convert_to_user(row, roles):
-    roles = list(map(lambda r: UserRole(r[1]), roles))
+    roles = list(map(lambda r: UserRole(r[1]), roles)) if roles else ()
+    print(roles)
     user = User(*row, roles=roles)
     return user
 
 
 def get_users(limit=None, where=''):
-    users = select_rows('users', limit, where=where)
+    users = select_rows('users', columns='id, name, password, photopath', where=where, limit=limit)
     if users and users[1]:
         users_obj = []
         for row in users[1]:
@@ -97,11 +99,12 @@ def get_LAST_INSERT_ID():
     return None
 
 
-def create_user(name, password):
+def create_user(name, password, photopath):
     with connection.cursor() as cursor:
         user = find_user(name=name)
+
         if user is None:
-            cursor.execute("INSERT INTO users (name, password) VALUES (%s, %s);", (name, password))
+            cursor.execute("INSERT INTO users (name, password, photopath) VALUES (%s, %s, %s);", (name, password, photopath))
             connection.commit()
             return cursor.lastrowid
         return None

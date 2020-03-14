@@ -1,4 +1,5 @@
 import os
+from uuid import uuid1
 
 content_types = {
     '.ico': 'image/vnd.microsoft.icon',
@@ -18,3 +19,14 @@ def get_content_type(path):
 
 def find_first(pred, iterable):
     return next(filter(pred, iterable), None)
+
+
+def save_photo(photodata):
+    if not photodata:
+        return None
+    u = uuid1()
+    filename = 'static/other/' + str(u.hex) + '.jpg'
+    file = open(filename, 'wb')
+    file.write(photodata)
+    file.close()
+    return filename
