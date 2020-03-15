@@ -55,4 +55,5 @@ def redirect_to(request, url=None, method=Method.GET):
 
     request.response.code = 302
     request.response.send_header('Location', url)
+    request.response.send_header('KEK', '1234567890')
     return ''

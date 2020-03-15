@@ -1,7 +1,6 @@
 html, body {
     /*background: linear-gradient(120deg, rgba(23, 190, 187, 1), rgba(240, 166, 202, 1));*/
     background-color: #ececec;
-    overflow: hidden;
 }
 
 .container {
@@ -148,22 +147,6 @@ html, body {
     font-weight: 300;
 }
 
-::-webkit-input-placeholder {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-:-moz-placeholder {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-::-moz-placeholder {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-:-ms-input-placeholder {
-    color: rgba(255, 255, 255, 0.9);
-}
-
 
 body {
     margin: 0;
@@ -174,8 +157,8 @@ body {
 
 .header {
     overflow: hidden;
-    background-color: #f1f1f1;
-    padding: 10px 10px;
+    background-color: #dadada;
+    padding: 8px 10px;
     padding-bottom: 10px;
     position: fixed;
     top: 0;
@@ -274,3 +257,19 @@ body {
         height: 145px;
     }
 }
+
+/*::-webkit-input-placeholder {*/
+/*    color: rgba(255, 255, 255, 0.9);*/
+/*}*/
+
+/*:-moz-placeholder {*/
+/*    color: rgba(255, 255, 255, 0.9);*/
+/*}*/
+
+/*::-moz-placeholder {*/
+/*    color: rgba(255, 255, 255, 0.9);*/
+/*}*/
+
+/*:-ms-input-placeholder {*/
+/*    color: rgba(255, 255, 255, 0.9);*/
+/*}*/

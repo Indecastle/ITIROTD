@@ -14,15 +14,15 @@ connection = pymysql.connect(host='192.168.100.5',
                              autocommit=True)
 
 
-def convert_args_to_querystr(**vargs):
-    return ' AND '.join([f'{key}="{value}"' for key, value in vargs.items()])
+def convert_args_to_querystr(joinstr, **vargs):
+    return joinstr.join([f'{key}="{value}"' for key, value in vargs.items()])
 
 
 def execute(request, args=None, limit=None):
     with connection.cursor() as cursor:
         cursor.execute(request, args)
         rows = cursor.fetchmany(limit) if limit else cursor.fetchall()
-        desc = list(map(lambda d: d[0], cursor.description))
+        desc = list(map(lambda d: d[0], cursor.description)) if cursor.description else ()
         return desc, rows
 
 
@@ -38,7 +38,7 @@ def convert_to_user(row, roles):
 
 
 def get_users(limit=None, where=''):
-    users = select_rows('users', columns='id, name, password, photopath', where=where, limit=limit)
+    users = select_rows('users', columns='id, login, password, name, email, photopath', where=where, limit=limit)
     if users and users[1]:
         users_obj = []
         for row in users[1]:
@@ -50,7 +50,7 @@ def get_users(limit=None, where=''):
 
 
 def find_user(**vargs):
-    str_args = convert_args_to_querystr(**vargs)
+    str_args = convert_args_to_querystr(' AND ', **vargs)
     users = get_users(where='WHERE %s' % str_args)
     return users[0] if users else None
 
@@ -99,12 +99,12 @@ def get_LAST_INSERT_ID():
     return None
 
 
-def create_user(name, password, photopath):
+def create_user(login, password, name, photopath):
     with connection.cursor() as cursor:
-        user = find_user(name=name)
+        user = find_user(login=login)
 
         if user is None:
-            cursor.execute("INSERT INTO users (name, password, photopath) VALUES (%s, %s, %s);", (name, password, photopath))
+            cursor.execute("INSERT INTO users (login, password, name, photopath) VALUES (%s, %s, %s, %s);", (login, password, name, photopath))
             connection.commit()
             return cursor.lastrowid
         return None
@@ -115,6 +115,11 @@ def create_session(id_user):
         cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", (id_user))
         connection.commit()
         return cursor.lastrowid
+
+
+def update_user(id_user, **vargs):
+    str_args = convert_args_to_querystr(', ', **vargs)
+    return execute(f"UPDATE users SET {str_args} WHERE id=%s", id_user)
 
 
 if __name__ == "__main__":

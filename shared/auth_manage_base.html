@@ -1,0 +1,56 @@
+<% from helper import ManageNavPages %>
+
+<% base = 'shared/base.html' %>
+<% base_vars.setdefault('title', 'Manage Title') %>
+<% user = request.auth_get_user() %>
+<%  base_vars.setdefault('active_page', '') %>
+
+<div class="container2">
+    <div class="row-profile">
+        <div class="col-md-3">
+
+            <div class="profile-sidebar">
+                <div class="profile-usertitle">
+                    <div class="profile-usertitle-name">
+                        <%= user.nickname %>
+                    </div>
+                    <div class="profile-usertitle-job">
+                        <img class="profile-img" src="/<%= user.photopath %>" onerror="this.onerror=null;this.src='/static/agent.png';">
+                    </div>
+                </div>
+                <div class="profile-usermenu">
+                    <ul class="nav">
+                        <li class="<%= ManageNavPages.index_nav(base_vars) %>">
+                            <a href="/auth/manage/index/">
+                                <i class="glyphicon glyphicon-home"></i>
+                                Profile </a>
+                        </li>
+                        <li class="<%= ManageNavPages.edit_nav(base_vars) %>">
+                            <a href="/auth/manage/edit_password/">
+                                <i class="glyphicon glyphicon-user"></i>
+                                Edit Password </a>
+                        </li>
+                        <li>
+                            <a href="#" target="_blank">
+                                <i class="glyphicon glyphicon-ok"></i>
+                                Tasks </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-flag"></i>
+                                Help </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-9">
+            <div class="profile-content">
+
+                    <%= body %>
+
+            </div>
+        </div>
+    </div>
+</div>

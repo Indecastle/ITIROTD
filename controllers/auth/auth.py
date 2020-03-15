@@ -17,12 +17,12 @@ def myauth(request, **kwargs):
 @route('/auth/login', method=Method.POST)
 def myauth_login_POST(request):
     data = request.POST_query
-    nickname, password = data["username"][0], data["password"][0]
+    login, password = data["login"][0], data["password"][0]
 
-    user = find_user(name=nickname)
+    user = find_user(login=login)
     if user is not None:
         if user.password == password:
-            create_session(request, user.nickname, user.id)
+            create_session(request, user.login, user.id)
             return redirect_to(request, '/')
     else:
         pass
@@ -34,12 +34,12 @@ def myauth_login_POST(request):
 @route('/auth/register', method=Method.POST)
 def myauth_register_POST(request):
     data = request.POST_query
-    nickname, password, email, photodata = data["username"][0], data["password"][0], data['email'][0], data['photopath'][0]
+    login, password, nickname, photodata = data["login"][0], data["password"][0], data['nickname'][0], data['photodata'][0]
 
-    user = find_user(name=nickname)
+    user = find_user(login=login)
     if user is None:
         photopath = save_photo(photodata)
-        user_id = create_user(nickname, password, photopath)
+        user_id = create_user(login, password, nickname, photopath)
         create_session(request, nickname, user_id)
         return redirect_to(request, '/')
     else:

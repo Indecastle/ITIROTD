@@ -18,15 +18,20 @@ class Authorize:
 class User:
     counter = 1
 
-    def __init__(self, id, nickname, password, photopath, roles=None):
+    def __init__(self, id, login, password, nickname, email, photopath, roles=None):
         if not roles:
             roles = {UserRole.USER}
         self.id = id
-        self.nickname = nickname
+        self.login = login
         self.password = password
+        self.nickname = nickname
+        self.email = email
         self.photopath = photopath
         self.roles = set(roles)
         User.counter += 1
+
+    def get_email(self):
+        return self.email if self.email else ''
 
 
 class Session:

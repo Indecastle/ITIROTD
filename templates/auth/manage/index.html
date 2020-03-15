@@ -1,51 +1,50 @@
-<% base = 'shared/base.html' %>
-<% base_vars['title'] = 'Manage Title' %>
+<% from helper import ManageNavPages %>
 
+<% base = 'shared/auth_manage_base.html' %>
+<% base_vars['title'] = 'Manage Index' %>
+<% base_vars['active_page'] = ManageNavPages.Pages.INDEX %>
 
-<div class="container2">
-    <div class="row-profile">
-        <div class="col-md-3">
-
-            <div class="profile-sidebar">
-                <div class="profile-usertitle">
-                    <div class="profile-usertitle-name">
-                        <%= user.nickname %>
-                    </div>
-                    <div class="profile-usertitle-job">
-                        <img class="profile-img" src="/<%= user.photopath %>">
-                    </div>
-                </div>
-                <div class="profile-usermenu">
-                    <ul class="nav">
-                        <li class="active">
-                            <a href="#">
-                                <i class="glyphicon glyphicon-home"></i>
-                                Overview </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="glyphicon glyphicon-user"></i>
-                                Account Settings </a>
-                        </li>
-                        <li>
-                            <a href="#" target="_blank">
-                                <i class="glyphicon glyphicon-ok"></i>
-                                Tasks </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="glyphicon glyphicon-flag"></i>
-                                Help </a>
-                        </li>
-                    </ul>
+<div class="form-style-5">
+    <form action="/auth/manage/change_profile" method="post" enctype="multipart/form-data">
+        <fieldset>
+            <legend><span class="number">1</span> Main Info</legend>
+            <input type="text" required name="name" placeholder="Your Name *" value="<%= user.nickname %>">
+            <input type="email" required name="email" placeholder="Your Email *" value="<%= user.get_email() %>">
+<!--            <textarea name="field3" placeholder="About yourself" style="resize: none;"></textarea>-->
+<!--            <label for="job">Interests:</label>-->
+<!--            <select id="job" name="field4">-->
+<!--                <optgroup label="Indoors">-->
+<!--                    <option value="fishkeeping">Fishkeeping</option>-->
+<!--                    <option value="reading">Reading</option>-->
+<!--                    <option value="boxing">Boxing</option>-->
+<!--                    <option value="debate">Debate</option>-->
+<!--                    <option value="gaming">Gaming</option>-->
+<!--                    <option value="snooker">Snooker</option>-->
+<!--                    <option value="other_indoor">Other</option>-->
+<!--                </optgroup>-->
+<!--                <optgroup label="Outdoors">-->
+<!--                    <option value="football">Football</option>-->
+<!--                    <option value="swimming">Swimming</option>-->
+<!--                    <option value="fishing">Fishing</option>-->
+<!--                    <option value="climbing">Climbing</option>-->
+<!--                    <option value="cycling">Cycling</option>-->
+<!--                    <option value="other_outdoor">Other</option>-->
+<!--                </optgroup>-->
+<!--            </select>-->
+            <div class="example-2">
+                <div class="form-group">
+                    <input type="file" name="photo" id="file" class="input-file">
+                    <label for="file" class="btn btn-tertiary js-labelFile">
+                        <i class="icon fa fa-check"></i>
+                        <span class="js-fileName">Upload image</span>
+                    </label>
                 </div>
             </div>
-
-        </div>
-        <div class="col-md-9">
-            <div class="profile-content">
-			   Some user related content goes here...
-            </div>
-        </div>
-    </div>
+        </fieldset>
+<!--        <fieldset>-->
+<!--            <legend><span class="number">2</span> Additional Info</legend>-->
+<!--            <textarea name="field3" placeholder="About Your School" style="resize: none;"></textarea>-->
+<!--        </fieldset>-->
+        <input type="submit" value="Apply"/>
+    </form>
 </div>

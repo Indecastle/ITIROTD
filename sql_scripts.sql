@@ -1,7 +1,7 @@
 use ITIROTD;
 
-INSERT INTO users (name, password) VALUES ('ADMIN', '123');
-INSERT INTO users (name, password) VALUES ('USER', 'abc');
+INSERT INTO users (login, password, name, email) VALUES ('ADMIN', '123', 'ADMIN', 'admin@sobaka.by');
+INSERT INTO users (login, password, name) VALUES ('USER', 'abc', 'USER');
 SELECT LAST_INSERT_ID();
 
 

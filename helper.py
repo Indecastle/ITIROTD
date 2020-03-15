@@ -1,5 +1,6 @@
 import os
 from uuid import uuid1
+from enum import Enum, auto
 
 content_types = {
     '.ico': 'image/vnd.microsoft.icon',
@@ -30,3 +31,23 @@ def save_photo(photodata):
     file.write(photodata)
     file.close()
     return filename
+
+
+class ManageNavPages:
+    class Pages(Enum):
+        INDEX = auto()
+        EDIT_PASSWORD = auto()
+
+    @staticmethod
+    def page_nav_class(vars, target_active):
+        if vars['active_page'] == target_active:
+            return 'active'
+        return ''
+
+    @staticmethod
+    def index_nav(vars):
+        return ManageNavPages.page_nav_class(vars, ManageNavPages.Pages.INDEX)
+
+    @staticmethod
+    def edit_nav(vars):
+        return ManageNavPages.page_nav_class(vars, ManageNavPages.Pages.EDIT_PASSWORD)
