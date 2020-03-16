@@ -76,4 +76,4 @@ websocket.onmessage = function (event) {
     }
 };
 
-websocket.onopen = () => websocket.send(JSON.stringify({action: 'init', nickname: find_cookie("nickname")}));
+websocket.onopen = () => websocket.send(JSON.stringify({action: 'init', session: find_cookie("SessionId")}));

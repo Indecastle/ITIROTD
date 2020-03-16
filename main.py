@@ -46,7 +46,7 @@ def generate_headers(request, method, url):
 
 
 def generate_content(request, method, code, url):
-    if code in (401, 404, 405):
+    if str(code)[0] == '4':
         return my_error(request, code).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
     if code == 302:
         return redirect_to(request)
@@ -172,6 +172,7 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 
 def run():
+    db.Connect()
     start_asyncio()
 
     server = ThreadingSimpleServer(('localhost', 80), CustomServer)

@@ -5,6 +5,7 @@ import json
 import logging
 import websockets
 from helper import find_first
+import db
 
 logging.basicConfig()
 
@@ -13,7 +14,7 @@ STATE = {"value": 0}
 USERS = []
 USERS_INFO = []
 MESSAGES = []
-index = 101
+lock = asyncio.Lock()
 
 
 def find_first(pred, iterable):
@@ -29,7 +30,8 @@ def event_messages():
 
 
 def users_event():
-    return json.dumps({"type": "users", "users": USERS})
+    list_users = [u.nickname for u in USERS]
+    return json.dumps({"type": "users", "users": list_users})
 
 
 def event_init():
@@ -59,38 +61,41 @@ async def send_message(message_info):
 
 
 async def register(websocket):
-    message = await websocket.recv();
-    nickname = json.loads(message)["nickname"]
-    userinfo = (websocket, nickname)
-    if nickname not in USERS:
-        USERS.append(nickname)
-    USERS_INFO.append(userinfo)
+    message = await websocket.recv()
+    sessionid = json.loads(message)["session"]
+    user = db.find_user_by_sessionid(sessionid)
+    if not user:
+        websocket.close()
+        return None
+    userinfo = (websocket, user)
+    async with lock:
+        if all(user.id != u.id for u in USERS):
+            USERS.append(user)
+        USERS_INFO.append(userinfo)
     await notify_users()
-    return nickname
+    return user.login
 
 
 async def unregister(websocket):
-    user_info = get_userinfo(websocket)
-    USERS_INFO.remove(user_info)
-    if all(x[1] != user_info[1] for x in USERS_INFO):
-        USERS.remove(user_info[1])
+    async with lock:
+        user_info = get_userinfo(websocket)
+        USERS_INFO.remove(user_info)
+        if all(x[1].id != user_info[1].id for x in USERS_INFO):
+            USERS.remove(user_info[1])
     await notify_users()
 
 
 async def counter(websocket, path):
     # register(websocket) sends user_event() to websocket
     try:
-        nickname = await register(websocket)
+        login = await register(websocket)
         await websocket.send(event_messages())
         async for message in websocket:
             data = json.loads(message)
             if data["action"] == "send_message":
-                message_info = (data['text'], nickname)
+                message_info = (data['text'], login)
                 MESSAGES.append(message_info)
                 await send_message(message_info)
-            # elif data["action"] == "plus":
-            #    STATE["value"] += 1
-            # await notify_state()
             else:
                 logging.error("unsupported event: {}", data)
     finally:

@@ -12,16 +12,16 @@ SESSIONS: List[Session] = []
 AUTHORIZE: List[Authorize] = []
 
 
-def create_session(request, nickname, user_id):
+def create_session(request, login, user_id):
     session_id = db.create_session(user_id)
     if session_id is not None:
         request.response.send_cookie('SessionId', session_id)
-        request.response.send_cookie('nickname', nickname)
+        request.response.send_cookie('login', login)
 
 
 def delete_session(request):
     request.response.remove_cookie('SessionId')
-    request.response.remove_cookie('nickname')
+    request.response.remove_cookie('login')
 
 
 def get_session(request):
@@ -37,7 +37,6 @@ def get_session(request):
 def isvalid_cookie(request, session) -> bool:
     if 'SessionId' in request.cookies:
         if session is None:
-            delete_session(request)
             return False
         else:
             request.auth_is = True
@@ -59,8 +58,12 @@ def check_authrole(request, session):
 
 
 def get_auth(request):
-    session = get_session(request)
+    try:
+        session = get_session(request)
+    except Exception as e:
+        return 405
     if not isvalid_cookie(request, session):
+        delete_session(request)
         return 302
     if check_authpage(request):
         if session and check_authrole(request, session):

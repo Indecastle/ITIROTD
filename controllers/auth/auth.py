@@ -40,7 +40,7 @@ def myauth_register_POST(request):
     if user is None:
         photopath = save_photo(photodata)
         user_id = create_user(login, password, nickname, photopath)
-        create_session(request, nickname, user_id)
+        create_session(request, login, user_id)
         return redirect_to(request, '/')
     else:
         pass

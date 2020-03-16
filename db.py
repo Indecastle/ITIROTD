@@ -3,15 +3,22 @@ import pymysql.cursors
 from tabulate import tabulate
 from models import *
 from pprint import pprint
+import threading
+
+lock = threading.RLock()
+connection = None
+
 
 # Connect to the database
-connection = pymysql.connect(host='192.168.100.5',
-                             port=3409,
-                             user='test',
-                             password='test',
-                             db='ITIROTD',
-                             charset='utf8mb4',
-                             autocommit=True)
+def Connect():
+    global connection
+    connection = pymysql.connect(host='192.168.100.5',
+                                 port=3409,
+                                 user='test',
+                                 password='test',
+                                 db='ITIROTD',
+                                 charset='utf8mb4',
+                                 autocommit=True)
 
 
 def convert_args_to_querystr(joinstr, **vargs):
@@ -20,13 +27,18 @@ def convert_args_to_querystr(joinstr, **vargs):
 
 def execute(request, args=None, limit=None):
     with connection.cursor() as cursor:
-        cursor.execute(request, args)
-        rows = cursor.fetchmany(limit) if limit else cursor.fetchall()
-        desc = list(map(lambda d: d[0], cursor.description)) if cursor.description else ()
-        return desc, rows
+        with lock:
+            try:
+                cursor.execute(request, args)
+                rows = cursor.fetchmany(limit) if limit else cursor.fetchall()
+                desc = list(map(lambda d: d[0], cursor.description)) if cursor.description else ()
+                return desc, rows
+            except pymysql.err.InterfaceError as e:
+                Connect()
+                raise Exception('InterfaceError')
 
 
-def select_rows(name_table, columns='*',  where='', limit=None):
+def select_rows(name_table, columns='*', where='', limit=None):
     return execute(f'SELECT {columns} FROM {name_table} {where};', limit=limit)
 
 
@@ -67,6 +79,14 @@ def find_session(id):
     return None
 
 
+def find_user_by_sessionid(id):
+    session = find_session(id)
+    if session:
+        user = find_user(id=session.user_id)
+        return user
+    return None
+
+
 def get_roles(limit=None):
     return select_rows('roles', limit)
 
@@ -101,20 +121,23 @@ def get_LAST_INSERT_ID():
 
 def create_user(login, password, name, photopath):
     with connection.cursor() as cursor:
-        user = find_user(login=login)
+        with lock:
+            user = find_user(login=login)
 
-        if user is None:
-            cursor.execute("INSERT INTO users (login, password, name, photopath) VALUES (%s, %s, %s, %s);", (login, password, name, photopath))
-            connection.commit()
-            return cursor.lastrowid
-        return None
+            if user is None:
+                cursor.execute("INSERT INTO users (login, password, name, photopath) VALUES (%s, %s, %s, %s);",
+                               (login, password, name, photopath))
+                connection.commit()
+                return cursor.lastrowid
+            return None
 
 
 def create_session(id_user):
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", (id_user))
-        connection.commit()
-        return cursor.lastrowid
+        with lock:
+            cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", (id_user))
+            connection.commit()
+            return cursor.lastrowid
 
 
 def update_user(id_user, **vargs):
@@ -123,6 +146,7 @@ def update_user(id_user, **vargs):
 
 
 if __name__ == "__main__":
+    pass
     # create_user('kek18', 'lol')
     # u = find_user("ADMIN")
     # print(u.id, u.nickname, u.roles)
@@ -148,7 +172,7 @@ if __name__ == "__main__":
 
     # create_session(13)
 
-    with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", 25)
-        connection.commit()
-        print(cursor.lastrowid)
+    # with connection.cursor() as cursor:
+    #     cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", 25)
+    #     connection.commit()
+    #     print(cursor.lastrowid)

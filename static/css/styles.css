@@ -19,7 +19,7 @@ html, body {
 }
 
 .chatbox {
-    background: rgba(255, 255, 255, 0.05);
+    background: #4e8e6abf;
     width: 600px;
     height: 75%;
     border-radius: 0.2em;
