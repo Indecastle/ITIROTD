@@ -1,0 +1,8 @@
+<% base = 'shared/base.html' %>
+<% kek = request.query.get('count2', '') %>
+<div class="container2">
+    <h1>Count = <%= count %></h1>
+    <% for chat in chats: %>
+        <h3>id=<%= chat.id %>, name=<%= chat.name %>, secure=<%= chat.secure.name %></h3>
+    <% end %>
+</div>

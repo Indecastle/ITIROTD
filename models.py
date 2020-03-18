@@ -18,7 +18,7 @@ class Authorize:
 class User:
     counter = 1
 
-    def __init__(self, id, login, password, nickname, email, photopath, roles=None):
+    def __init__(self, id, login, password, nickname, photopath, email, roles=None):
         if not roles:
             roles = {UserRole.USER}
         self.id = id
@@ -43,9 +43,28 @@ class Session:
         self.user = None
 
 
+
+class Chat:
+    class Type(Enum):
+        PUBLIC = auto()
+        SECURE = auto()
+
+    def __init__(self, id, name, secure, password='123', users=None):
+        if users is None:
+            users = []
+        self.id = id
+        self.name = name
+        self.secure = Chat.Type(secure)
+        self.password = password
+
+
+
 if __name__ == "__main__":
     a = UserRole.USER
     b = str(a)
 
     print(UserRole["USER"])
     print(UserRole(1))
+
+    print(Chat.Type(1))
+    print(Chat.Type(2))

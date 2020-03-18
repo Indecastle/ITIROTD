@@ -50,7 +50,7 @@ def convert_to_user(row, roles):
 
 
 def get_users(limit=None, where=''):
-    users = select_rows('users', columns='id, login, password, name, email, photopath', where=where, limit=limit)
+    users = select_rows('users', columns='id, login, password, name, photopath, email', where=where, limit=limit)
     if users and users[1]:
         users_obj = []
         for row in users[1]:
@@ -100,23 +100,23 @@ def get_sessions(limit=None, where=''):
         """)
 
 
-def get_next_AUTO_INCREMENT(table):
-    rows = execute(f""" 
-        SELECT AUTO_INCREMENT
-        FROM information_schema.TABLES
-        WHERE TABLE_SCHEMA = "ITIROTD"
-        AND TABLE_NAME = "{table}";
-    """)
-    if rows and rows[1]:
-        return rows[1][0][0]
-    return None
-
-
-def get_LAST_INSERT_ID():
-    rows = execute("SELECT LAST_INSERT_ID();")
-    if rows and rows[1]:
-        return rows[1][0][0]
-    return None
+# def get_next_AUTO_INCREMENT(table):
+#     rows = execute(f"""
+#         SELECT AUTO_INCREMENT
+#         FROM information_schema.TABLES
+#         WHERE TABLE_SCHEMA = "ITIROTD"
+#         AND TABLE_NAME = "{table}";
+#     """)
+#     if rows and rows[1]:
+#         return rows[1][0][0]
+#     return None
+#
+#
+# def get_LAST_INSERT_ID():
+#     rows = execute("SELECT LAST_INSERT_ID();")
+#     if rows and rows[1]:
+#         return rows[1][0][0]
+#     return None
 
 
 def create_user(login, password, name, photopath):
@@ -139,6 +139,45 @@ def create_session(id_user):
             connection.commit()
             return cursor.lastrowid
 
+# ======================================================
+
+def convert_to_chat(row, users):
+    users = list(map(lambda r: User(*r), users)) if users else ()
+    print(users)
+    chat = Chat(*row, users=users)
+    return chat
+
+
+def create_chat(name, secure, password=None):
+    with connection.cursor() as cursor:
+        with lock:
+            cursor.execute("INSERT INTO chat (name, secure, password) VALUES (%s, %s, %s);", (name, secure, password))
+            connection.commit()
+            return cursor.lastrowid
+
+
+def get_chats(limit=None, where=''):
+    chats = select_rows('chat', columns='id, name, secure, password', where=where, limit=limit)
+    if chats and chats[1]:
+        chats_obj = []
+        for row in chats[1]:
+            users_ref = execute("SELECT users.* FROM chat_has_users "
+                                "inner join users on chat_has_users.users_id=users.id "
+                                "WHERE chat_id=%s;", row[0])
+            chat = convert_to_chat(row, users_ref[1])
+            chats_obj.append(chat)
+        return chats_obj
+    return None
+
+
+def find_chat(**vargs):
+    str_args = convert_args_to_querystr(' AND ', **vargs)
+    chats = get_chats(where='WHERE %s' % str_args)
+    return chats[0] if chats else None
+
+
+# ======================================================
+
 
 def update_user(id_user, **vargs):
     str_args = convert_args_to_querystr(', ', **vargs)
@@ -147,6 +186,7 @@ def update_user(id_user, **vargs):
 
 if __name__ == "__main__":
     pass
+    Connect()
     # create_user('kek18', 'lol')
     # u = find_user("ADMIN")
     # print(u.id, u.nickname, u.roles)
@@ -176,3 +216,6 @@ if __name__ == "__main__":
     #     cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", 25)
     #     connection.commit()
     #     print(cursor.lastrowid)
+
+    chats = get_chats()
+    print(chats)

@@ -24,12 +24,6 @@ def blog_POST(request):
     return json.dumps(request.POST_query)
 
 
-@route('/chat', authorize=Authorize())
-def chat(request):
-    kwargs = {}
-    return render_template(request, 'templates/chat.html', **kwargs)
-
-
 @route('/mytest')
 def test_page(request):
     SESSIONS.clear()

@@ -60,12 +60,22 @@ async def send_message(message_info):
         await asyncio.wait([user[0].send(message) for user in USERS_INFO])
 
 
+async def action_send_message(data, login):
+    message_info = (data['text'], login)
+    MESSAGES.append(message_info)
+    await send_message(message_info)
+
+
+actions = {
+    'send_message': action_send_message
+}
+
+
 async def register(websocket):
     message = await websocket.recv()
     sessionid = json.loads(message)["session"]
     user = db.find_user_by_sessionid(sessionid)
     if not user:
-        websocket.close()
         return None
     userinfo = (websocket, user)
     async with lock:
@@ -89,13 +99,13 @@ async def counter(websocket, path):
     # register(websocket) sends user_event() to websocket
     try:
         login = await register(websocket)
+        if login is None:
+            return
         await websocket.send(event_messages())
         async for message in websocket:
             data = json.loads(message)
-            if data["action"] == "send_message":
-                message_info = (data['text'], login)
-                MESSAGES.append(message_info)
-                await send_message(message_info)
+            if data["action"] in actions:
+                await actions[data['action']](data, login)
             else:
                 logging.error("unsupported event: {}", data)
     finally:
