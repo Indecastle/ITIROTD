@@ -3,19 +3,32 @@
 <div class="container2">
     <h1><%= request.query %></h1>
     <div class="form-style-5">
-        <form action="/chat/createchat" method="post">
+        <form action="/chat/createchat" method="post" id="createchat_form" onload="create_chat_form();">
             <fieldset>
                 <legend><span class="number">1</span> Create Chat</legend>
-                <input type="text" required name="name" placeholder="Old Password" value="12345678">
-                <input type="text" required name="password" placeholder="New Password *">
-                <select name="type">
+                <input type="text" required name="name" placeholder="Name">
+                <select id="createchat_select" name="type">
                     <optgroup label="Type Safe">
-                        <option value="public" selected>Public</option>
-                        <option value="secure">Secure</option>
+                        <option value="PUBLIC" selected>Public</option>
+                        <option value="SECURE">Secure</option>
                     </optgroup>
                 </select>
+                <input id="createchat_password" type="text" name="password" placeholder="Password"
+                       style="display: none;">
             </fieldset>
             <input type="submit" value="Apply"/>
         </form>
     </div>
+    <%= message %>
 </div>
+
+
+<script type="text/javascript">
+    let tag_form = document.getElementById("createchat_form");
+    let tag_select = document.getElementById("createchat_select");
+    let tag_password = document.getElementById("createchat_password");
+
+    tag_select.onchange = () => {
+        tag_password.style = tag_select.value === "public" ? "display: none;" : '';
+    };
+</script>

@@ -12,7 +12,7 @@ connection = None
 # Connect to the database
 def Connect():
     global connection
-    connection = pymysql.connect(host='192.168.100.5',
+    connection = pymysql.connect(host='192.168.43.41',
                                  port=3409,
                                  user='test',
                                  password='test',
@@ -148,16 +148,35 @@ def convert_to_chat(row, users):
     return chat
 
 
-def create_chat(name, secure, password=None):
+def create_chat(name, secure, user_id, password=None):
     with connection.cursor() as cursor:
         with lock:
             cursor.execute("INSERT INTO chat (name, secure, password) VALUES (%s, %s, %s);", (name, secure, password))
             connection.commit()
-            return cursor.lastrowid
+            chat_id = cursor.lastrowid
+            cursor.execute("INSERT INTO chat_has_users (chat_id, users_id) VALUES (%s, %s);", (chat_id, user_id))
+            connection.commit()
+            return chat_id
 
 
 def get_chats(limit=None, where=''):
     chats = select_rows('chat', columns='id, name, secure, password', where=where, limit=limit)
+    if chats and chats[1]:
+        chats_obj = []
+        for row in chats[1]:
+            users_ref = execute("SELECT users.* FROM chat_has_users "
+                                "inner join users on chat_has_users.users_id=users.id "
+                                "WHERE chat_id=%s;", row[0])
+            chat = convert_to_chat(row, users_ref[1])
+            chats_obj.append(chat)
+        return chats_obj
+    return None
+
+
+def get_chats_by_user(user_id, limit=None):
+    chats = execute("SELECT chat.* FROM chat_has_users "
+                    "INNER JOIN chat on chat_has_users.chat_id=chat.id "
+                    "WHERE users_id=%s;", user_id)
     if chats and chats[1]:
         chats_obj = []
         for row in chats[1]:
@@ -217,5 +236,8 @@ if __name__ == "__main__":
     #     connection.commit()
     #     print(cursor.lastrowid)
 
-    chats = get_chats()
+    # chats = get_chats()
+    # print(chats)
+
+    chats = get_chats_by_user(34)
     print(chats)

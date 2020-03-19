@@ -56,6 +56,7 @@ class Chat:
         self.name = name
         self.secure = Chat.Type(secure)
         self.password = password
+        self.users = users
 
 
 
