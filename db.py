@@ -143,7 +143,7 @@ def create_session(id_user):
 
 def convert_to_chat(row, users):
     users = list(map(lambda r: User(*r), users)) if users else ()
-    print(users)
+    # print(users)
     chat = Chat(*row, users=users)
     return chat
 

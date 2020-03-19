@@ -1,1 +1,21 @@
 <% base = 'shared/base.html' %>
+
+<div class="container2">
+    <h1><%= request.query %></h1>
+    <div class="form-style-5">
+        <form action="/chat/createchat" method="post">
+            <fieldset>
+                <legend><span class="number">1</span> Create Chat</legend>
+                <input type="text" required name="name" placeholder="Old Password" value="12345678">
+                <input type="text" required name="password" placeholder="New Password *">
+                <select name="type">
+                    <optgroup label="Type Safe">
+                        <option value="public" selected>Public</option>
+                        <option value="secure">Secure</option>
+                    </optgroup>
+                </select>
+            </fieldset>
+            <input type="submit" value="Apply"/>
+        </form>
+    </div>
+</div>
