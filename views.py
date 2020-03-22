@@ -4,6 +4,7 @@ from routes import *
 from render import *
 from auth import SESSIONS
 from helper import save_photo
+from error import my_error
 
 
 @route('/', '/index')
@@ -26,8 +27,13 @@ def blog_POST(request):
 
 @route('/mytest')
 def test_page(request):
-    SESSIONS.clear()
-    return redirect_to(request, request, '/')
+    query = request.query
+    kek = query.get('kek', [None])[0]
+    if kek == 'lol':
+        request.response.code = 444
+        return my_error(request, message=("KEK", "LOL"))
+
+    return redirect_to(request, '/')
 
 
 @route('/index_POST', method=Method.POST)

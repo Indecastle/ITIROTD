@@ -39,10 +39,10 @@ def manage_edit_password(request, **kwargs):
 @route('auth/manage/edit_password', method=Method.POST, authorize=Authorize())
 def manage_edit_password_POST(request, **kwargs):
     data = request.POST_query
-    new_password = data["new_password"][0].strip()
+    old_password, new_password, confirm_password = data["old_password"][0].strip(), data["new_password"][0].strip(), \
+                                                   data["confirm_password"][0].strip()
     user = request.auth_get_user()
-
-    if not new_password:
+    if not new_password or new_password != confirm_password or old_password != user.password:
         kwargs.setdefault('message', 'bad password')
         return render_template(request, 'templates/auth/manage/edit_password.html', **kwargs)
 

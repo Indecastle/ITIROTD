@@ -43,21 +43,33 @@ class Session:
         self.user = None
 
 
-
 class Chat:
     class Type(Enum):
         PUBLIC = auto()
         SECURE = auto()
 
-    def __init__(self, id, name, secure, password='123', users=None):
+    def __init__(self, id, name, secure, password='123', users=None, messages=None):
         if users is None:
             users = []
+        if messages is None:
+            messages = []
         self.id = id
         self.name = name
         self.secure = Chat.Type(secure)
         self.password = password
         self.users = users
+        self.messages = messages
 
+
+class Message:
+    def __init__(self, id, chat_id, user_id, when, text):
+        self.id = id
+        self.chat_id = chat_id
+        self.user_id = user_id
+        self.when = when
+        self.text = text
+
+        self.user = None
 
 
 if __name__ == "__main__":

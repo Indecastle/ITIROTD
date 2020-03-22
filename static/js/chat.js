@@ -1,20 +1,20 @@
 function find_cookie(key) {
     let cookie = document.cookie.split(';');
     let find_el = cookie.find((item) => item.trim().startsWith(key + '='));
-	if (find_el !== undefined)
-		return find_el.split('=', 2)[1];
-	return undefined;
+    if (find_el !== undefined)
+        return find_el.split('=', 2)[1];
+    return undefined;
 }
 
 var user_list = document.querySelector('#user_list'),
-chat_list = document.querySelector('#chat_list'),
-my_form = document.querySelector('#my_form'),
-text_message = document.querySelector('#text_message'),
-websocket = new WebSocket("ws://127.0.0.1:6789/"),
-users = [];
+    chat_list = document.querySelector('#chat_list'),
+    my_form = document.querySelector('#my_form'),
+    text_message = document.querySelector('#text_message'),
+    websocket = new WebSocket("ws://127.0.0.1:6789/"),
+    users = [];
 
 
-my_form.onsubmit = function(event) {
+my_form.onsubmit = function (event) {
     event.preventDefault();
     websocket.send(JSON.stringify({action: 'send_message', text: text_message.value}));
     text_message.value = '';
@@ -32,8 +32,8 @@ function render_message(text, who) {
     div2.classList.add("chatbox__messages__user-message--ind-message");
     p.classList.add("name");
     p2.classList.add("message");
-    p.innerHTML = text
-    p2.innerHTML = who
+    p.innerHTML = text;
+    p2.innerHTML = who;
 
     div2.appendChild(p);
     div2.appendChild(br);
@@ -67,8 +67,12 @@ websocket.onmessage = function (event) {
             render_message(data.text, data.who)
             break;
         case 'users':
-            users = data.users
-            render_users()
+            users = data.users;
+            render_users();
+            break;
+        case 'redirect':
+            console.log('REDIRECT');
+            window.location.href = "/";
             break;
         default:
             console.error(
@@ -76,4 +80,10 @@ websocket.onmessage = function (event) {
     }
 };
 
-websocket.onopen = () => websocket.send(JSON.stringify({action: 'init', session: find_cookie("SessionId")}));
+var searchParams = new URLSearchParams(window.location.search);
+websocket.onopen = () => websocket.send(JSON.stringify({
+    action: 'init',
+    session: find_cookie("SessionId"),
+    chat_id: searchParams.get('chat_id'),
+    password: searchParams.get('pass')
+}));

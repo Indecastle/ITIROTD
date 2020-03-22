@@ -22,6 +22,15 @@ def find_first(pred, iterable):
     return next(filter(pred, iterable), None)
 
 
+def try_to_int(text, null=None):
+    try:
+        return int(text)
+    except ValueError:
+        return null
+    except TypeError:
+        return null
+
+
 def save_photo(photodata):
     if not photodata:
         return None

@@ -4,6 +4,7 @@ from tabulate import tabulate
 from models import *
 from pprint import pprint
 import threading
+from helper import find_first
 
 lock = threading.RLock()
 connection = None
@@ -12,7 +13,7 @@ connection = None
 # Connect to the database
 def Connect():
     global connection
-    connection = pymysql.connect(host='192.168.43.41',
+    connection = pymysql.connect(host='192.168.100.5',
                                  port=3409,
                                  user='test',
                                  password='test',
@@ -44,7 +45,7 @@ def select_rows(name_table, columns='*', where='', limit=None):
 
 def convert_to_user(row, roles):
     roles = list(map(lambda r: UserRole(r[1]), roles)) if roles else ()
-    print(roles)
+    # print(roles)
     user = User(*row, roles=roles)
     return user
 
@@ -139,12 +140,36 @@ def create_session(id_user):
             connection.commit()
             return cursor.lastrowid
 
+
 # ======================================================
 
-def convert_to_chat(row, users):
-    users = list(map(lambda r: User(*r), users)) if users else ()
+def create_message(chat_id, user_id, when, text):
+    with connection.cursor() as cursor:
+        with lock:
+            cursor.execute("INSERT INTO messages (chat_id, users_id, `when`, text) VALUES (%s, %s, %s, %s);",
+                           (chat_id, user_id, when, text))
+            connection.commit()
+            return cursor.lastrowid
+
+
+def get_messages(chat_id, limit=None):
+    messages_ref = select_rows('messages', columns='id, chat_id, users_id, `when`, text',
+                               where='WHERE chat_id=%s' % chat_id, limit=limit)
+    if messages_ref and messages_ref[1]:
+        return list(map(lambda m: Message(*m), messages_ref[1]))
+    return None
+
+
+# ======================================================
+
+
+def convert_to_chat(row, users_ref, messages):
+    users = list(map(lambda u: User(*u), users_ref)) if users_ref else None
+    if messages:
+        for m in messages:
+            m.user = find_first(lambda u: u.id == m.user_id, users)
     # print(users)
-    chat = Chat(*row, users=users)
+    chat = Chat(*row, users=users, messages=messages)
     return chat
 
 
@@ -159,39 +184,46 @@ def create_chat(name, secure, user_id, password=None):
             return chat_id
 
 
-def get_chats(limit=None, where=''):
-    chats = select_rows('chat', columns='id, name, secure, password', where=where, limit=limit)
-    if chats and chats[1]:
+def _get_chats_sql(chats_sql, is_messages=False, is_users=False, limit=None):
+    if chats_sql and chats_sql[1]:
         chats_obj = []
-        for row in chats[1]:
-            users_ref = execute("SELECT users.* FROM chat_has_users "
-                                "inner join users on chat_has_users.users_id=users.id "
-                                "WHERE chat_id=%s;", row[0])
-            chat = convert_to_chat(row, users_ref[1])
+        for row in chats_sql[1]:
+            if is_users:
+                users_ref = execute("SELECT users.* FROM chat_has_users "
+                                    "inner join users on chat_has_users.users_id=users.id "
+                                    "WHERE chat_id=%s;", row[0], limit=limit)[1]
+            else:
+                users_ref = None
+            messages = get_messages(row[0]) if is_messages else None
+            chat = convert_to_chat(row, users_ref, messages)
             chats_obj.append(chat)
         return chats_obj
     return None
 
 
-def get_chats_by_user(user_id, limit=None):
+def get_chats(limit=None, where='', is_messages=False, is_users=False):
+    chats = select_rows('chat', columns='id, name, secure, password', where=where, limit=limit)
+    return _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
+
+
+def get_chats_by_user(user_id, chat_id=None, is_messages=False, is_users=False, limit=None):
+    where_args = {'users_id': user_id}
+    if chat_id is not None:
+        where_args.update(chat_id=chat_id)
+    where_sql = convert_args_to_querystr(' AND ', **where_args)
+
     chats = execute("SELECT chat.* FROM chat_has_users "
                     "INNER JOIN chat on chat_has_users.chat_id=chat.id "
-                    "WHERE users_id=%s;", user_id)
-    if chats and chats[1]:
-        chats_obj = []
-        for row in chats[1]:
-            users_ref = execute("SELECT users.* FROM chat_has_users "
-                                "inner join users on chat_has_users.users_id=users.id "
-                                "WHERE chat_id=%s;", row[0])
-            chat = convert_to_chat(row, users_ref[1])
-            chats_obj.append(chat)
+                    f"WHERE {where_sql};", limit=limit)
+    chats_obj = _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
+    if chats_obj is None or chat_id is None:
         return chats_obj
-    return None
+    return chats_obj[0]
 
 
-def find_chat(**vargs):
-    str_args = convert_args_to_querystr(' AND ', **vargs)
-    chats = get_chats(where='WHERE %s' % str_args)
+def find_chat(where={}, is_messages=False, is_users=False):
+    str_args = convert_args_to_querystr(' AND ', **where)
+    chats = get_chats(where='WHERE %s' % str_args, is_messages=is_messages, is_users=is_users)
     return chats[0] if chats else None
 
 
@@ -239,5 +271,5 @@ if __name__ == "__main__":
     # chats = get_chats()
     # print(chats)
 
-    chats = get_chats_by_user(34)
+    chats = get_chats_by_user(37, is_messages=True)
     print(chats)

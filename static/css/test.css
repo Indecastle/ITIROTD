@@ -183,7 +183,7 @@ html, body {
     color: #555;
     padding: 0;
     line-height: 40px;
-    width: 300px;
+    max-width: 300px;
     /*margin: auto;*/
     margin: 0 auto 20px 0;
     display: block;

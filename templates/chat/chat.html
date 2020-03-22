@@ -24,7 +24,8 @@
             </div>
 
         </div>
-        <div id="chat_list" class="chatbox__messages" ng-repeat="message in messages">
+        <div id="chat_list" class="chatbox__messages" ng-repeat="message in messages"
+             style="overflow-x: hidden; overflow-y: scroll; height: 100%;">
             <div class="chatbox__messages__user-message">
                 <div class="chatbox__messages__user-message--ind-message">
                     <p class="name">{{message.Name}}</p>
@@ -40,4 +41,4 @@
 </div>
 
 
-<script src="../static/js/chat.js" ></script>
+<script src="../static/js/chat.js"></script>

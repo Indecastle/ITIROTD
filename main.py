@@ -13,6 +13,7 @@ from helper import get_content_type
 from chat_websocket import start_asyncio
 import views
 import db
+import models
 
 
 import controllers
@@ -48,7 +49,7 @@ def generate_headers(request, method, url):
 
 def generate_content(request, method, code, url):
     if str(code)[0] == '4':
-        return my_error(request, code).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
+        return my_error(request).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
     if code == 302:
         return redirect_to(request)
     if re.match(r'^/static', url):
@@ -111,7 +112,7 @@ class CustomServer(BaseHTTPRequestHandler):
         self.auth_session = None
         self.__auth_user = False
 
-    def auth_get_user(self, none=None):
+    def auth_get_user(self, none=None) -> models.User:
         if self.auth_session and self.__auth_user is False:
             user = db.find_user(id=self.auth_session.user_id)
             self.__auth_user = user if user else none
