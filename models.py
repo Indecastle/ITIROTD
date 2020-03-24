@@ -16,8 +16,6 @@ class Authorize:
 
 
 class User:
-    counter = 1
-
     def __init__(self, id, login, password, nickname, photopath, email, roles=None):
         if not roles:
             roles = {UserRole.USER}
@@ -28,15 +26,18 @@ class User:
         self.email = email
         self.photopath = photopath
         self.roles = set(roles)
-        User.counter += 1
+
+        self.is_reading = False
 
     def get_email(self):
         return self.email if self.email else ''
 
+    def to_dict(self):
+        return {'id': self.id, 'login': self.login, 'nickname': self.nickname, 'email': self.email,
+                'is_reading': self.is_reading}
+
 
 class Session:
-    counter = 1001
-
     def __init__(self, id, user_id):
         self.id = id
         self.user_id = user_id
