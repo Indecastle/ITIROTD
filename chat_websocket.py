@@ -7,6 +7,7 @@ import websockets
 from helper import find_first, try_to_int
 import db
 from models import Chat, Message
+from config import WEBSOCKET_CHAT_PATH
 
 logging.basicConfig()
 
@@ -29,12 +30,19 @@ class SessionChat:
         self.chat = chat
         self.USERS = []
         self.USERS_INFO = []
-        self.is_reading = False
+        # self.is_reading = False
 
         self.actions = {
             'send_message': self.action_send_message,
             'reading_message': self.action_reading_message
         }
+
+    async def websocket_send(self, message, users_info=None):
+        if users_info is None:
+            users_info = self.USERS_INFO
+        elif type(users_info) != list:
+            users_info = [users_info]
+        await asyncio.wait([user.websocket.send(message) for user in users_info])
 
     async def connect_chat(self, websocket, user):
         async with self.lock:
@@ -45,6 +53,7 @@ class SessionChat:
         await websocket.send(self.gen_init(user))
         await websocket.send(self.event_messages())
         await self.notify_users()
+        await self.send_isreading()
         return user_info
 
     async def disconnect_chat(self, websocket, user_info):
@@ -67,24 +76,25 @@ class SessionChat:
         return json.dumps({"type": "get_messages", "messages": messages})
 
     def gen_init(self, user):
-        return json.dumps({"type": "init", "user": user.to_dict()})
+        users_dict = [u.to_dict() for u in self.chat.users]
+        return json.dumps({"type": "init", "user": user.to_dict(), 'users': users_dict})
 
     async def notify_messages(self):
         if self.USERS:  # asyncio.wait doesn't accept an empty list
             message = self.event_messages()
-            await asyncio.wait([user.websocket.send(message) for user in self.USERS_INFO])
+            await self.websocket_send(message)
 
     async def notify_users(self):
         if self.USERS:  # asyncio.wait doesn't accept an empty list
             list_users = [u.to_dict() for u in self.USERS]
             message = json.dumps({"type": "users", "users": list_users})
-            await asyncio.wait([user.websocket.send(message) for user in self.USERS_INFO])
+            await self.websocket_send(message)
 
     async def send_message(self, message):
         if self.USERS:  # asyncio.wait doesn't accept an empty list
             json_encoded = json.dumps(
                 {"type": "get_one_message", "text": message.text, 'user': message.user.to_dict()})
-            await asyncio.wait([user.websocket.send(json_encoded) for user in self.USERS_INFO])
+            await self.websocket_send(json_encoded)
 
     async def action_send_message(self, data, user_info):
         user = user_info.user
@@ -97,17 +107,26 @@ class SessionChat:
             self.chat.messages.append(new_message)
         await self.send_message(new_message)
 
+
+    async def send_isreading(self):
+        users_isreading = list(user.to_dict() for user in self.USERS if user.is_reading)
+        print('users_isreading', users_isreading)
+        json_str = json.dumps(
+            {"type": "is_reading", "user": None, 'users_is_reading': users_isreading})
+        await self.websocket_send(json_str)
+
     async def action_reading_message(self, data, user_info):
         user_info.is_reading = data['is_reading']
         is_reading = any(ui.is_reading for ui in self.USERS_INFO if ui.user is user_info.user)
         if user_info.user.is_reading != is_reading:
             user_info.user.is_reading = is_reading
-            global_is_reading = any(ui.is_reading for ui in self.USERS_INFO)
-            if self.is_reading != global_is_reading:
-                self.is_reading = global_is_reading
-                json_str = json.dumps(
-                    {"type": "is_reading", "user": user_info.user.to_dict(), 'is_reading': self.is_reading})
-                await asyncio.wait([ui.websocket.send(json_str) for ui in self.USERS_INFO])
+            await self.send_isreading()
+            # global_is_reading = any(user.is_reading for user in self.USERS)
+            # if self.is_reading != global_is_reading:
+            #     self.is_reading = global_is_reading
+            #     json_str = json.dumps(
+            #         {"type": "is_reading", "user": user_info.user.to_dict(), 'is_reading': self.is_reading})
+            #     await asyncio.wait([ui.websocket.send(json_str) for ui in self.USERS_INFO])
 
 
 SESSION_CHATS = []
@@ -174,7 +193,7 @@ def start_asyncio():
     def run_in_thread():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        start_server = websockets.serve(action_loop, "localhost", 6789)
+        start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH)
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
 
@@ -183,6 +202,6 @@ def start_asyncio():
 
 
 if __name__ == "__main__":
-    start_server = websockets.serve(action_loop, "localhost", 6789)
+    start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH)
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()

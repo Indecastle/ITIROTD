@@ -5,6 +5,7 @@ from models import *
 from pprint import pprint
 import threading
 from helper import find_first
+from config import DB
 
 lock = threading.RLock()
 connection = None
@@ -13,13 +14,7 @@ connection = None
 # Connect to the database
 def Connect():
     global connection
-    connection = pymysql.connect(host='192.168.100.5',
-                                 port=3409,
-                                 user='test',
-                                 password='test',
-                                 db='ITIROTD',
-                                 charset='utf8mb4',
-                                 autocommit=True)
+    connection = pymysql.connect(**DB)
 
 
 def convert_args_to_querystr(joinstr, **vargs):

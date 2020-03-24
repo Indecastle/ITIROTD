@@ -11,8 +11,9 @@ var user_list = document.querySelector('#user_list'),
     my_form = document.querySelector('#my_form'),
     text_message = document.querySelector('#text_message'),
     p_is_reading = document.querySelector('#form_p'),
-    websocket = new WebSocket("ws://127.0.0.1:6789/"),
+    websocket = new WebSocket("ws://192.168.100.3:6789/"),
     users = [],
+    all_users = [],
     my_user,
     invalid_user = {'id': -1, 'is_reading': null};
 
@@ -42,6 +43,7 @@ function render_message(text, user) {
     var br = document.createElement("br");
     var p2 = document.createElement("p");
 
+    div.id = 'message_';
     div.classList.add("chatbox__messages__user-message");
     div2.classList.add("chatbox__messages__user-message--ind-message");
     p.classList.add("name");
@@ -56,34 +58,48 @@ function render_message(text, user) {
     chat_list.appendChild(div);
 }
 
-function render_users() {
+function render_all_users() {
     user_list.innerHTML = '';
-    for (let user of users) {
+    for (let user of all_users) {
         var div = document.createElement("div");
         var p = document.createElement("p");
         div.classList.add("chatbox__user--active");
         p.textContent = user.nickname;
         div.appendChild(p);
         user_list.appendChild(div);
+        user['dom_element'] = div
     }
 }
 
-function action_is_reading(user, is_reading2) {
-    if (user.id !== my_user.id) {
-        if (is_reading2) {
-            p_is_reading.innerHTML = 'reading...';
-        } else {
-            p_is_reading.innerHTML = '';
-        }
+function render_users() {
+    for (let user of all_users) {
+        user2 = users.find(u => u.id === user.id);
+        user.dom_element.className = '';
+        // user.dom_element.classList.remove(...element.classList);
+        if (user2 === undefined)
+            user.dom_element.classList.add('chatbox__user--busy');
+        else
+            user.dom_element.classList.add('chatbox__user--active');
+    }
+}
+
+function action_is_reading(user, users_is_reading) {
+    users_name = users_is_reading.filter(user => user.id !== my_user.id).map(user => user.nickname);
+    if (users_name.length > 0) {
+        p_is_reading.innerHTML = 'reading...' + JSON.stringify(users_name);
+    } else {
+        p_is_reading.innerHTML = '';
     }
 }
 
 websocket.onmessage = function (event) {
-    data = JSON.parse(event.data);
+    var data = JSON.parse(event.data);
     console.log(data);
     switch (data.type) {
         case 'init':
             my_user = data.user;
+            all_users = data.users;
+            render_all_users();
             break;
         case 'get_messages':
             chat_list.innerHTML = '';
@@ -100,7 +116,7 @@ websocket.onmessage = function (event) {
             // action_is_reading(invalid_user, null);
             break;
         case 'is_reading':
-            action_is_reading(data.user, data.is_reading);
+            action_is_reading(data.user, data.users_is_reading);
             break;
         case 'redirect':
             console.log('REDIRECT');

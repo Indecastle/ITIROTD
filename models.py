@@ -72,6 +72,10 @@ class Message:
 
         self.user = None
 
+    def to_dict(self):
+        return {'id': self.id, 'user_id': self.user_id, 'when': self.when, 'text': self.text,
+                'is_reading': self.is_reading}
+
 
 if __name__ == "__main__":
     a = UserRole.USER

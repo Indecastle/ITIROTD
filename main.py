@@ -14,7 +14,7 @@ from chat_websocket import start_asyncio
 import views
 import db
 import models
-
+import config
 
 import controllers
 
@@ -100,6 +100,14 @@ class Response:
         self.send_header('Set-Cookie', f"{key}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")
 
 
+class QueryDict(dict):
+    def __init__(self, query_dict):
+        super().__init__()
+        self.update(**query_dict)
+
+    def get2(self, key):
+        return self.get(key, [None])[0]
+
 class CustomServer(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
 
@@ -156,6 +164,7 @@ class CustomServer(BaseHTTPRequestHandler):
 
     def parse_query_GET(self):
         self.query = parse_qs(urlsplit(self.path).query)
+        self.query = QueryDict(self.query)
         self.path = urlsplit(self.path).path
         if self.path != '/':
             self.path = self.path.rstrip('/')
@@ -177,7 +186,7 @@ def run():
     db.Connect()
     start_asyncio()
 
-    server = ThreadingSimpleServer(('localhost', 80), CustomServer)
+    server = ThreadingSimpleServer(config.SOCKET_PATH, CustomServer)
     server.serve_forever()
 
 print("Run Server...")
