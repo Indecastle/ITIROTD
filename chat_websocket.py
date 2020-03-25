@@ -37,12 +37,12 @@ class SessionChat:
             'reading_message': self.action_reading_message
         }
 
-    async def websocket_send(self, message, users_info=None):
+    async def websocket_send(self, message, users_info=None, except_user_info=None):
         if users_info is None:
             users_info = self.USERS_INFO
         elif type(users_info) != list:
             users_info = [users_info]
-        await asyncio.wait([user.websocket.send(message) for user in users_info])
+        await asyncio.wait([user.websocket.send(message) for user in users_info if user is not except_user_info])
 
     async def connect_chat(self, websocket, user):
         async with self.lock:
@@ -53,7 +53,7 @@ class SessionChat:
         await websocket.send(self.gen_init(user))
         await websocket.send(self.event_messages())
         await self.notify_users()
-        await self.send_isreading()
+        await self.action_reading_message({'is_reading': False}, user_info)
         return user_info
 
     async def disconnect_chat(self, websocket, user_info):
@@ -72,7 +72,7 @@ class SessionChat:
         return find_first(lambda x: x.websocket == websocket, self.USERS_INFO)
 
     def event_messages(self):
-        messages = list(map(lambda m: (m.text, m.user.nickname), self.chat.messages))
+        messages = list(map(lambda m: (m.text, m.user.to_dict()), self.chat.messages))
         return json.dumps({"type": "get_messages", "messages": messages})
 
     def gen_init(self, user):
@@ -108,19 +108,19 @@ class SessionChat:
         await self.send_message(new_message)
 
 
-    async def send_isreading(self):
+    async def send_isreading(self, user_info):
         users_isreading = list(user.to_dict() for user in self.USERS if user.is_reading)
         print('users_isreading', users_isreading)
         json_str = json.dumps(
             {"type": "is_reading", "user": None, 'users_is_reading': users_isreading})
-        await self.websocket_send(json_str)
+        await self.websocket_send(json_str, except_user_info=user_info)
 
     async def action_reading_message(self, data, user_info):
         user_info.is_reading = data['is_reading']
         is_reading = any(ui.is_reading for ui in self.USERS_INFO if ui.user is user_info.user)
         if user_info.user.is_reading != is_reading:
             user_info.user.is_reading = is_reading
-            await self.send_isreading()
+            await self.send_isreading(user_info)
             # global_is_reading = any(user.is_reading for user in self.USERS)
             # if self.is_reading != global_is_reading:
             #     self.is_reading = global_is_reading

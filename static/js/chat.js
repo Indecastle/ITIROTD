@@ -12,7 +12,7 @@ var user_list = document.querySelector('#user_list'),
     text_message = document.querySelector('#text_message'),
     p_is_reading = document.querySelector('#form_p'),
     websocket = new WebSocket("ws://192.168.100.3:6789/"),
-    users = [],
+    online_users = [],
     all_users = [],
     my_user,
     invalid_user = {'id': -1, 'is_reading': null};
@@ -73,7 +73,7 @@ function render_all_users() {
 
 function render_users() {
     for (let user of all_users) {
-        user2 = users.find(u => u.id === user.id);
+        user2 = online_users.find(u => u.id === user.id);
         user.dom_element.className = '';
         // user.dom_element.classList.remove(...element.classList);
         if (user2 === undefined)
@@ -103,15 +103,18 @@ websocket.onmessage = function (event) {
             break;
         case 'get_messages':
             chat_list.innerHTML = '';
-            for (let [text, who] of data.messages) {
-                render_message(text, who);
+            for (let [text, user] of data.messages) {
+                render_message(text, user);
             }
             break;
         case 'get_one_message':
+            if (!is_focus) {
+                showNotification(data.user.nickname, data.text);
+            }
             render_message(data.text, data.user);
             break;
         case 'users':
-            users = data.users;
+            online_users = data.users;
             render_users();
             // action_is_reading(invalid_user, null);
             break;
@@ -135,3 +138,15 @@ websocket.onopen = () => websocket.send(JSON.stringify({
     chat_id: searchParams.get('chat_id'),
     password: searchParams.get('pass')
 }));
+
+
+/*
+setInterval(function(){
+   if(is_focus === 1) {
+       showNotification("YES");
+   }
+   else {
+        showNotification();
+   }
+}, 2000);
+*/
