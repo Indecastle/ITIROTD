@@ -49,16 +49,16 @@ class Chat:
         PUBLIC = auto()
         SECURE = auto()
 
-    def __init__(self, id, name, secure, password='123', users=None, messages=None):
-        if users is None:
-            users = []
-        if messages is None:
-            messages = []
+    def __init__(self, id, name, secure, password='123', users=None, messages=None, log_users=None):
+        if users is None: users = []
+        if messages is None: messages = []
+        if log_users is None: log_users = []
         self.id = id
         self.name = name
         self.secure = Chat.Type(secure)
         self.password = password
         self.users = users
+        self.log_users = log_users
         self.messages = messages
 
 
@@ -74,7 +74,7 @@ class Message:
 
     def to_dict(self):
         return {'id': self.id, 'user_id': self.user_id, 'when': self.when, 'text': self.text,
-                'is_reading': self.is_reading}
+                'is_reading': None}
 
 
 if __name__ == "__main__":

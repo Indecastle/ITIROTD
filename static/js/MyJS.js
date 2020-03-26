@@ -27,6 +27,21 @@ function animate({duration, draw, timing}) {
     });
 }
 
+function create_UUID() {
+    var dt = new Date().getTime();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (dt + Math.random() * 16) % 16 | 0;
+        dt = Math.floor(dt / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+function my_sleep(ms) {
+    ms += new Date().getTime();
+    while (new Date() < ms) {
+    }
+}
+
 var notificationsEnabled = false;
 
 function initNotifications() {
@@ -43,13 +58,13 @@ function initNotifications() {
     }
 }
 
-function showNotification(title, message) {
+function showNotification(title, message, tag='tag') {
     if (notificationsEnabled) {
         var notification = new Notification(title, {
             body: message,
             // icon: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             vibrate: [200, 100, 200],
-            tag: "Message",
+            tag: tag,
             // image: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             badge: "/static/sun.ico",
             // actions: [{action: "Detail", title: "View", icon: "https://via.placeholder.com/128/ff0000"}]

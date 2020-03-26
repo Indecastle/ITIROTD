@@ -160,9 +160,16 @@ def get_messages(chat_id, limit=None):
 
 def convert_to_chat(row, users_ref, messages):
     users = list(map(lambda u: User(*u), users_ref)) if users_ref else None
+    log_users = []
     if messages:
         for m in messages:
             m.user = find_first(lambda u: u.id == m.user_id, users)
+            if m.user is None:
+                m.user = find_first(lambda u: u.id == m.user_id, log_users)
+                if m.user is None:
+                    m.user = find_user(id=m.user_id)
+                    log_users.append(log_users)
+
     # print(users)
     chat = Chat(*row, users=users, messages=messages)
     return chat
