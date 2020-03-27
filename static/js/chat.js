@@ -12,6 +12,7 @@ var user_list = document.querySelector('#user_list'),
     text_message = document.querySelector('#text_message'),
     p_is_reading = document.querySelector('#form_p'),
     websocket = new WebSocket("ws://192.168.100.3:6789/"),
+    all_messages = [],
     online_users = [],
     all_users = [],
     my_user,
@@ -42,21 +43,19 @@ my_form.onsubmit = function (event) {
 function render_message(message, user, is_new_message, uuid = 'invalid') {
     let div = document.querySelector('#new_message_' + uuid);
     if (div !== null) {
+        let finded_message = all_messages.find(mes => mes.id === uuid);
+        Object.assign(finded_message, message);
         div.id = 'message_' + message.id;
-        div.style = '';
+        // div.style = '';
+        div.classList.remove("chatbox_nosend");
+        if (user.id === my_user.id)
+            div.classList.add('chatbox_noreaded')
     } else {
         div = document.createElement("div");
         let div2 = document.createElement("div");
         let p = document.createElement("p");
         let br = document.createElement("br");
         let p2 = document.createElement("p");
-
-        if (is_new_message === true) {
-            div2.id = 'new_message_' + uuid;
-            div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
-        } else {
-            div2.id = 'message_' + message.id;
-        }
 
         div.classList.add("chatbox__messages__user-message");
         div2.classList.add("chatbox__messages__user-message--ind-message");
@@ -70,6 +69,27 @@ function render_message(message, user, is_new_message, uuid = 'invalid') {
         div2.appendChild(p2);
         div.appendChild(div2);
         chat_list.appendChild(div);
+
+        if (message.id === null)
+            message.id = uuid;
+        message['dom_element'] = div2;
+        all_messages.push(message);
+
+        if (is_new_message === true) {
+            div2.id = 'new_message_' + uuid;
+            div2.classList.add("chatbox_nosend");
+            // div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
+        } else {
+            div2.id = 'message_' + message.id;
+        }
+    }
+}
+
+function action_onfocus(user_id) {
+    var filter_messages = all_messages.filter(mes => mes.user_id === my_user.id);
+    var user = online_users.find(user => user.id === user_id);
+    if (my_user.id !== user_id) {
+        filter_messages.forEach(mes => mes.dom_element.classList.remove('chatbox_noreaded'));
     }
 
 }
@@ -89,7 +109,7 @@ function render_all_users() {
 
 function render_users() {
     for (let user of all_users) {
-        user2 = online_users.find(u => u.id === user.id);
+        let user2 = online_users.find(u => u.id === user.id);
         user.dom_element.className = '';
         // user.dom_element.classList.remove(...element.classList);
         if (user2 === undefined)
@@ -113,6 +133,9 @@ websocket.onmessage = function (event) {
     console.log(data);
     switch (data.type) {
         case 'init':
+            if (data.is_focus) {
+                
+            }
             my_user = data.user;
             all_users = data.users;
             render_all_users();
@@ -137,6 +160,9 @@ websocket.onmessage = function (event) {
         case 'is_reading':
             action_is_reading(data.user, data.users_is_reading);
             break;
+        case 'window_onfocus':
+            action_onfocus(data.user_id);
+            break;
         case 'redirect':
             console.log('REDIRECT');
             window.location.href = "/";
@@ -156,13 +182,11 @@ websocket.onopen = () => websocket.send(JSON.stringify({
 }));
 
 
-/*
-setInterval(function(){
-   if(is_focus === 1) {
-       showNotification("YES");
-   }
-   else {
-        showNotification();
-   }
+setInterval(function () {
+    if (is_focus === 1) {
+        websocket.send(JSON.stringify({action: 'window_onfocus'}));
+    } else {
+    }
 }, 2000);
-*/
+
+

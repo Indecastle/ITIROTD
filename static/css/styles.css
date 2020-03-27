@@ -71,6 +71,14 @@ html, body {
     overflow: auto;
 }
 
+.chatbox__messages__user-message--ind-message.chatbox_noreaded {
+    background-color: #11773eb3;
+}
+
+.chatbox__messages__user-message--ind-message.chatbox_nosend {
+    background-color: rgba(100, 100, 100, 0.2);
+}
+
 .chatbox__messages__user-message--ind-message > p.name {
     color: #fff;
     font-size: 1em;

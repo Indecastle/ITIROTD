@@ -31,10 +31,12 @@ class SessionChat:
         self.chat = chat
         self.USERS = []
         self.USERS_INFO = []
-        # self.is_reading = False
+        self.is_focus = True
+        self.is_focus_last_user = None
 
         self.actions = {
             'send_message': self.action_send_message,
+            'window_onfocus': self.action_window_onfocus,
             'reading_message': self.action_reading_message
         }
 
@@ -76,7 +78,7 @@ class SessionChat:
 
     def gen_init(self, user):
         users_dict = [u.to_dict() for u in self.chat.users]
-        return json.dumps({"type": "init", "user": user.to_dict(), 'users': users_dict})
+        return json.dumps({"type": "init", "user": user.to_dict(), 'users': users_dict, 'is_focus': self.is_focus})
 
     async def notify_messages(self):
         if self.USERS:  # asyncio.wait doesn't accept an empty list
@@ -97,7 +99,8 @@ class SessionChat:
             await self.websocket_send(json_encoded)
 
     async def action_send_message(self, data, user_info):
-        # await asyncio.sleep(2)
+        await asyncio.sleep(1)
+        await self.action_window_onfocus(None, user_info)
         user = user_info.user
         text = data['text']
         uuid = data['uuid']
@@ -108,6 +111,14 @@ class SessionChat:
         async with self.lock_messages:
             self.chat.messages.append(new_message)
         await self.send_message(new_message, uuid)
+        self.is_focus = False
+
+    async def action_window_onfocus(self, data, user_info):
+        if not self.is_focus or True:
+            self.is_focus_last_user = user_info.user
+            self.is_focus = True
+            json_encoded = json.dumps({"type": "window_onfocus", 'user_id': user_info.user.id})
+            await self.websocket_send(json_encoded)
 
     async def send_isreading(self, user_info):
         users_isreading = list(user.to_dict() for user in self.USERS if user.is_reading)
