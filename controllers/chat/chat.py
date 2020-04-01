@@ -16,7 +16,9 @@ def chat(request):
     user = request.auth_get_user()
     chat = db.get_chats_by_user(user_id=user.id, chat_id=chat_id)
     if chat is None or chat.secure == Chat.Type.SECURE and chat.password != chat_password:
-        return redirect_to(request, '/')
+        request.response.code = 444
+        return my_error(request, message=("chat secure", "bad password of chat or access denied"))
+        # return redirect_to(request, '/')
 
     kwargs = {}
     return render_template(request, 'templates/chat/chat.html', **kwargs)

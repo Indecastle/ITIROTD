@@ -4,7 +4,7 @@ from tabulate import tabulate
 from models import *
 from pprint import pprint
 import threading
-from helper import find_first
+from helper import find_first, convert_args_to_querystr
 from config import DB
 
 lock = threading.RLock()
@@ -17,8 +17,7 @@ def Connect():
     connection = pymysql.connect(**DB)
 
 
-def convert_args_to_querystr(joinstr, **vargs):
-    return joinstr.join([f'{key}="{value}"' for key, value in vargs.items()])
+
 
 
 def execute(request, args=None, limit=None):
@@ -54,11 +53,11 @@ def get_users(limit=None, where=''):
             user = convert_to_user(row, roles_ref[1])
             users_obj.append(user)
         return users_obj
-    return None
+    return []
 
 
 def find_user(**vargs):
-    str_args = convert_args_to_querystr(' AND ', **vargs)
+    str_args = convert_args_to_querystr(' AND ', query=vargs)
     users = get_users(where='WHERE %s' % str_args)
     return users[0] if users else None
 
@@ -175,14 +174,15 @@ def convert_to_chat(row, users_ref, messages):
     return chat
 
 
-def create_chat(name, secure, user_id, password=None):
+def create_chat(name, secure, password=None, user_id=None):
     with connection.cursor() as cursor:
         with lock:
             cursor.execute("INSERT INTO chat (name, secure, password) VALUES (%s, %s, %s);", (name, secure, password))
             connection.commit()
             chat_id = cursor.lastrowid
-            cursor.execute("INSERT INTO chat_has_users (chat_id, users_id) VALUES (%s, %s);", (chat_id, user_id))
-            connection.commit()
+            if user_id is not None:
+                cursor.execute("INSERT INTO chat_has_users (chat_id, users_id) VALUES (%s, %s);", (chat_id, user_id))
+                connection.commit()
             return chat_id
 
 
@@ -212,28 +212,40 @@ def get_chats_by_user(user_id, chat_id=None, is_messages=False, is_users=False, 
     where_args = {'users_id': user_id}
     if chat_id is not None:
         where_args.update(chat_id=chat_id)
-    where_sql = convert_args_to_querystr(' AND ', **where_args)
+    where_sql = convert_args_to_querystr(' AND ', query=where_args)
 
     chats = execute("SELECT chat.* FROM chat_has_users "
                     "INNER JOIN chat on chat_has_users.chat_id=chat.id "
                     f"WHERE {where_sql};", limit=limit)
     chats_obj = _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
-    if chats_obj is None or chat_id is None:
+
+    if chats_obj is not None and chat_id is None:
         return chats_obj
+    if chats_obj is None and chat_id is not None:
+        return None
     return chats_obj[0]
 
 
 def find_chat(where={}, is_messages=False, is_users=False):
-    str_args = convert_args_to_querystr(' AND ', **where)
+    str_args = convert_args_to_querystr(' AND ', query=where)
     chats = get_chats(where='WHERE %s' % str_args, is_messages=is_messages, is_users=is_users)
     return chats[0] if chats else None
+
+
+def add_user_to_chat(chat_id, user_id):
+    with connection.cursor() as cursor:
+        with lock:
+            cursor.execute("INSERT INTO chat_has_users (chat_id, users_id) VALUES (%s, %s);", (chat_id, user_id))
+            connection.commit()
+            chat_id = cursor.lastrowid
+            return chat_id
 
 
 # ======================================================
 
 
 def update_user(id_user, **vargs):
-    str_args = convert_args_to_querystr(', ', **vargs)
+    str_args = convert_args_to_querystr(', ', query=vargs)
     return execute(f"UPDATE users SET {str_args} WHERE id=%s", id_user)
 
 

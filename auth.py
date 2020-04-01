@@ -66,10 +66,7 @@ def get_auth(request):
         delete_session(request)
         return 302
     if check_authpage(request):
-        if session and check_authrole(request, session):
-            return 200
-        else:
-            # create_session(request)
+        if not (session and check_authrole(request, session)):
             return 401
 
     return 200

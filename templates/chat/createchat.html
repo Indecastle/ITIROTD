@@ -1,25 +1,45 @@
 <% base = 'shared/base.html' %>
 
 <div class="container2">
-    <h1><%= request.query %></h1>
-    <div class="form-style-5">
-        <form action="/chat/createchat" method="post" id="createchat_form" onload="create_chat_form();">
-            <fieldset>
-                <legend><span class="number">1</span> Create Chat</legend>
-                <input type="text" required name="name" placeholder="Name">
-                <select id="createchat_select" name="type">
-                    <optgroup label="Type Safe">
-                        <option value="PUBLIC" selected>Public</option>
-                        <option value="SECURE">Secure</option>
-                    </optgroup>
-                </select>
-                <input id="createchat_password" type="text" name="password" placeholder="Password"
-                       style="display: none;">
-            </fieldset>
-            <input type="submit" value="Apply"/>
-        </form>
-    </div>
-    <%= message %>
+    <form action="/chat/createchat" method="post" id="createchat_form" onload="create_chat_form();">
+        <div class="col-md-9">
+            <div class="form-style-5">
+
+                <fieldset>
+                    <legend><span class="number">1</span> Create Chat</legend>
+                    <input type="text" required name="name" placeholder="Name">
+                    <select id="createchat_select" name="type">
+                        <optgroup label="Type Safe">
+                            <option value="PUBLIC" selected>Public</option>
+                            <option value="SECURE">Secure</option>
+                        </optgroup>
+                    </select>
+                    <input id="createchat_password" type="text" name="password" placeholder="Password"
+                           style="display: none;">
+                </fieldset>
+                <input type="submit" value="Apply"/>
+
+            </div>
+            <%= message %>
+        </div>
+        <div class="col-md-3">
+
+            <div class="form-style-5">
+
+                <fieldset>
+                    <legend><span class="number">2</span> Users</legend>
+                    <div class="checkbox-div">
+                        <% for user in users: %>
+                        <label class="checkbox-container"><%= user.nickname %>
+                            <input type="checkbox" name="users" value="<%= user.id %>">
+                            <span class="checkmark"></span>
+                        </label>
+                        <% end %>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </form>
 </div>
 
 

@@ -14,7 +14,7 @@ inner join users on sessions.id_user = users.id;
 
 INSERT INTO roles (id, name) VALUES (1, "USER"), (2, "ADMIN");
 
-INSERT INTO users_has_roles (users_id, roles_id) VALUES (20, 1), (20, 2);
+INSERT INTO users_has_roles (users_id, roles_id) VALUES (1, 1), (1, 2);
 
 set global sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';

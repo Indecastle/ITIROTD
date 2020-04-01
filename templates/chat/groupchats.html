@@ -3,6 +3,7 @@
 <div class="container2">
     <h1>Count = <%= count %></h1>
     <% for chat in chats: %>
-        <h3>id=<%= chat.id %>, name=<%= chat.name %>, secure=<%= chat.secure.name %></h3>
+        <h3><a href="/chat/chat?chat_id=<%= chat.id %>">id=<%= chat.id %>, name=<%= chat.name %>, secure=<%= chat.secure.name %></a></h3>
     <% end %>
 </div>
+

@@ -11,7 +11,6 @@ from error import *
 from routes import *
 from helper import get_content_type
 from chat_websocket import start_asyncio
-import views
 import db
 import models
 import config
@@ -105,8 +104,11 @@ class QueryDict(dict):
         super().__init__()
         self.update(**query_dict)
 
-    def get2(self, key):
-        return self.get(key, [None])[0]
+    def get2(self, key, null=None):
+        return self.get(key, [null])[0]
+
+    def getmany(self, key, null=None):
+        return self.get(key, null)
 
 class CustomServer(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
@@ -115,6 +117,7 @@ class CustomServer(BaseHTTPRequestHandler):
         #self.protocol_version = 'HTTP/1.1'
         self.response = Response(self)
         self.parse_cookies()
+        self.query = None
         self.POST_query = None
         self.auth_is = False
         self.auth_session = None

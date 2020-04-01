@@ -31,6 +31,11 @@ def try_to_int(text, null=None):
         return null
 
 
+def convert_args_to_querystr(joinstr, query, is_str=True):
+    convert_value = lambda value: f'"{value}"' if is_str else value
+    return joinstr.join([f'{key}={convert_value(value)}' for key, value in query.items()])
+
+
 def save_photo(photodata):
     if not photodata:
         return None
