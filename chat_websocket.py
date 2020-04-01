@@ -1,13 +1,8 @@
-import threading, itertools, time
-
-import asyncio
-import json
-import logging
-import websockets
+import threading, itertools, time, ssl, asyncio, json, logging, websockets
 from helper import find_first, try_to_int
 import db
 from models import Chat, Message
-from config import WEBSOCKET_CHAT_PATH
+from config import WEBSOCKET_CHAT_PATH, SSL_PEM_PATH
 
 logging.basicConfig()
 
@@ -202,7 +197,11 @@ def start_asyncio():
     def run_in_thread():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH)
+
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_context.load_cert_chain(SSL_PEM_PATH)
+        start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH, ssl=ssl_context)
+
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
 

@@ -31,6 +31,7 @@ def generate_headers(request, method, url):
         if os.path.isfile(url[1:]):
             subp = url[8:]
             content_type = get_content_type(subp)
+
         else:
             code = 404
     else:
@@ -62,6 +63,7 @@ def generate_content(request, method, code, url):
 
 def send_headers(request):
     request.send_response(request.response.code)
+    request.response.send_header('Content-Type', request.response.content_type)
     for k, v_list in request.response.headers.items():
         for v in v_list:
             request.send_header(k, v)
@@ -75,7 +77,7 @@ def generate_response(request):
     body = generate_content(request, method, code, url)
 
     request.response.send_header('Content-Length', len(body))
-
+    print(request.response.headers)
     send_headers(request)
     request.wfile.write(body)
 
@@ -86,8 +88,8 @@ class Response:
         self.wfile = request.wfile
 
         self.code = 200
+        self.content_type = 'text/html'
         self.headers = defaultdict(list)
-        self.send_header('content_type', 'text/html')
 
     def send_header(self, key, value):
         self.headers[key].append(value)
@@ -184,13 +186,22 @@ class CustomServer(BaseHTTPRequestHandler):
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
-
+import ssl, threading
 def run():
     db.Connect()
     start_asyncio()
 
-    server = ThreadingSimpleServer(config.SOCKET_PATH, CustomServer)
-    server.serve_forever()
+    def start_http_server():
+        server = ThreadingSimpleServer(config.SOCKET_HTTP, CustomServer)
+        server.serve_forever()
+
+    chat_service = threading.Thread(target=start_http_server)
+    chat_service.start()
+
+    server2 = ThreadingSimpleServer(config.SOCKET_HTTPS, CustomServer)
+    server2.socket = ssl.wrap_socket(server2.socket, certfile=config.SSL_PEM_PATH, server_side=True)
+    server2.serve_forever()
+
 
 print("Run Server...")
 run()
