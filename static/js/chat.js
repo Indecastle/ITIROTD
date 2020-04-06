@@ -134,9 +134,10 @@ websocket.onmessage = function (event) {
     switch (data.type) {
         case 'init':
             if (data.is_focus) {
-                
             }
             my_user = data.user;
+            break;
+        case 'all_users':
             all_users = data.users;
             render_all_users();
             break;
@@ -176,9 +177,10 @@ websocket.onmessage = function (event) {
 var searchParams = new URLSearchParams(window.location.search);
 websocket.onopen = () => websocket.send(JSON.stringify({
     action: 'init',
-    session: find_cookie("SessionId"),
+    sessionHash: find_cookie("SessionHash"),
+    user_id: find_cookie("user_id"),
     chat_id: searchParams.get('chat_id'),
-    password: searchParams.get('pass')
+    // password: searchParams.get('pass')
 }));
 
 

@@ -5,6 +5,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from cgi import parse_header, parse_multipart
 from urllib.parse import parse_qs, urlsplit, urlparse
 from http import cookies
+import ssl, threading
 
 from auth import get_auth
 from error import *
@@ -16,6 +17,16 @@ import models
 import config
 
 import controllers
+
+
+def log_request(request):
+    if request.auth_session is not None:
+        user = request.auth_get_user()
+        print('Session_id: ', request.auth_session.user_id, ' |  user_id: ', user.id, ' |  login: ', user.login,
+              ' |  path: ', request.path)
+    else:
+        print('null')
+
 
 def get_static_file(url):
     with open(url[1:], 'rb') as file:
@@ -55,6 +66,7 @@ def generate_content(request, method, code, url):
     if re.match(r'^/static', url):
         return get_static_file(url)
     else:
+        log_request(request)
         if method == 'GET':
             return URLS[url](request).encode('utf-8')
         if method == 'POST':
@@ -77,7 +89,6 @@ def generate_response(request):
     body = generate_content(request, method, code, url)
 
     request.response.send_header('Content-Length', len(body))
-    print(request.response.headers)
     send_headers(request)
     request.wfile.write(body)
 
@@ -112,25 +123,25 @@ class QueryDict(dict):
     def getmany(self, key, null=None):
         return self.get(key, null)
 
+
 class CustomServer(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
 
     def _init(self):
-        #self.protocol_version = 'HTTP/1.1'
+        # self.protocol_version = 'HTTP/1.1'
         self.response = Response(self)
         self.parse_cookies()
         self.query = None
         self.POST_query = None
         self.auth_is = False
         self.auth_session = None
-        self.__auth_user = False
+        self._auth_user = False
 
     def auth_get_user(self, none=None) -> models.User:
-        if self.auth_session and self.__auth_user is False:
+        if self.auth_session and self._auth_user is False:
             user = db.find_user(id=self.auth_session.user_id)
             self.__auth_user = user if user else none
         return self.__auth_user
-
 
     def _set_headers(self):
         self.send_response(200)
@@ -148,8 +159,6 @@ class CustomServer(BaseHTTPRequestHandler):
         print("POST:", self.POST_query)
         generate_response(self)
 
-
-
     def parse_POST(self):
         kek = self.headers['content-type']
         ctype, pdict = parse_header(kek)
@@ -165,7 +174,7 @@ class CustomServer(BaseHTTPRequestHandler):
                 keep_blank_values=1)
         else:
             postvars = {}
-        return postvars
+        return QueryDict(postvars)
 
     def parse_query_GET(self):
         self.query = parse_qs(urlsplit(self.path).query)
@@ -186,7 +195,7 @@ class CustomServer(BaseHTTPRequestHandler):
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
-import ssl, threading
+
 def run():
     db.Connect()
     start_asyncio()

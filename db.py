@@ -3,7 +3,7 @@ import pymysql.cursors
 from tabulate import tabulate
 from models import *
 from pprint import pprint
-import threading
+import threading, time, os, hashlib
 from helper import find_first, convert_args_to_querystr
 from config import DB
 
@@ -15,9 +15,6 @@ connection = None
 def Connect():
     global connection
     connection = pymysql.connect(**DB)
-
-
-
 
 
 def execute(request, args=None, limit=None):
@@ -66,16 +63,17 @@ def convert_to_session(row):
     return Session(*row)
 
 
-def find_session(id):
-    sessions = select_rows('sessions', where='WHERE id="%s"' % id)
+def find_session(user_id, session_hash):
+    sessions = select_rows('sessions', columns='id, user_id, HEX(hash), `when`',
+                           where='WHERE user_id="%s" AND hash=UNHEX("%s")' % (user_id, session_hash))
     if sessions and sessions[1]:
         session = convert_to_session(sessions[1][0])
         return session
     return None
 
 
-def find_user_by_sessionid(id):
-    session = find_session(id)
+def find_user_by_sessionid(id, hash):
+    session = find_session(id, hash)
     if session:
         user = find_user(id=session.user_id)
         return user
@@ -90,7 +88,7 @@ def get_sessions(limit=None, where=''):
     return execute(f"""
         SELECT sessions.id, sessions.id_user, users.name AS username, users.password AS password
         FROM sessions
-        inner join users on sessions.id_user = users.id
+        inner join users on sessions.id_user = users.id;
         {where};
         """)
 
@@ -118,7 +116,6 @@ def create_user(login, password, name, photopath):
     with connection.cursor() as cursor:
         with lock:
             user = find_user(login=login)
-
             if user is None:
                 cursor.execute("INSERT INTO users (login, password, name, photopath) VALUES (%s, %s, %s, %s);",
                                (login, password, name, photopath))
@@ -127,10 +124,11 @@ def create_user(login, password, name, photopath):
             return None
 
 
-def create_session(id_user):
+def create_session(id_user, hash, when):
     with connection.cursor() as cursor:
         with lock:
-            cursor.execute("INSERT INTO sessions (id_user) VALUES (%s);", (id_user))
+            cursor.execute("INSERT INTO sessions (user_id, hash, `when`) VALUES (%s, UNHEX(%s), %s);",
+                           (id_user, hash, when))
             connection.commit()
             return cursor.lastrowid
 
@@ -158,7 +156,7 @@ def get_messages(chat_id, limit=None):
 
 
 def convert_to_chat(row, users_ref, messages):
-    users = list(map(lambda u: User(*u), users_ref)) if users_ref else None
+    users = list(map(lambda u: User(*u), users_ref)) if users_ref else []
     log_users = []
     if messages:
         for m in messages:
@@ -167,7 +165,7 @@ def convert_to_chat(row, users_ref, messages):
                 m.user = find_first(lambda u: u.id == m.user_id, log_users)
                 if m.user is None:
                     m.user = find_user(id=m.user_id)
-                    log_users.append(log_users)
+                    log_users.append(m.user)
 
     # print(users)
     chat = Chat(*row, users=users, messages=messages)
@@ -221,7 +219,9 @@ def get_chats_by_user(user_id, chat_id=None, is_messages=False, is_users=False, 
 
     if chats_obj is not None and chat_id is None:
         return chats_obj
-    if chats_obj is None and chat_id is not None:
+    if chats_obj is None and chat_id is None:
+        return []
+    if chats_obj is None:
         return None
     return chats_obj[0]
 
@@ -285,5 +285,16 @@ if __name__ == "__main__":
     # chats = get_chats()
     # print(chats)
 
-    chats = get_chats_by_user(37, is_messages=True)
-    print(chats)
+    # chats = get_chats_by_user(1, is_messages=True, is_users=True)
+    # print(chats)
+
+    # users = get_users()
+    # with connection.cursor() as cursor:
+    #     for user in users:
+    #         salt = os.urandom(32)
+    #         key = hashlib.pbkdf2_hmac('sha512', user.password.encode('utf-8'), salt, 100000)
+    #         pass_encrypte = (salt + key).hex()
+    #
+    #         cursor.execute("UPDATE users SET password=%s WHERE id=%s;", (pass_encrypte, user.id))
+    #     connection.commit()
+    #     print(cursor.lastrowid)

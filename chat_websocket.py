@@ -44,13 +44,15 @@ class SessionChat:
         if users_info:
             await asyncio.wait([ui.websocket.send(message) for ui in users_info])
 
-    async def connect_chat(self, websocket, user):
+    async def connect_chat(self, websocket, user, is_new_user):
         async with self.lock:
             if all(user.id != u.id for u in self.USERS):
                 self.USERS.append(user)
             user_info = SessionChatUser(websocket, user)
             self.USERS_INFO.append(user_info)
-        await websocket.send(self.gen_init(user))
+        # await websocket.send(self.gen_init(user))
+        await self.websocket_send(self.gen_init(user), user_info)
+        await self.notify_all_users()
         await self.notify_users()
         await self.notify_messages()
         await self.action_reading_message({'is_reading': False}, user_info)
@@ -73,7 +75,12 @@ class SessionChat:
 
     def gen_init(self, user):
         users_dict = [u.to_dict() for u in self.chat.users]
-        return json.dumps({"type": "init", "user": user.to_dict(), 'users': users_dict, 'is_focus': self.is_focus})
+        return json.dumps({"type": "init", "user": user.to_dict(), 'is_focus': self.is_focus})
+
+    async def notify_all_users(self):
+        list_users = [u.to_dict() for u in self.chat.users]
+        message = json.dumps({"type": "all_users",  'users': list_users})
+        await self.websocket_send(message)
 
     async def notify_messages(self):
         if self.USERS:  # asyncio.wait doesn't accept an empty list
@@ -117,7 +124,7 @@ class SessionChat:
 
     async def send_isreading(self, user_info):
         users_isreading = list(user.to_dict() for user in self.USERS if user.is_reading)
-        print('users_isreading', users_isreading)
+        # print('users_isreading', users_isreading)
         json_str = json.dumps(
             {"type": "is_reading", "user": None, 'users_is_reading': users_isreading})
         await self.websocket_send(json_str, except_user_info=user_info)
@@ -138,31 +145,32 @@ class SessionChat:
 
 async def register(websocket):
     message = await websocket.recv()
-    sessionid = try_to_int(json.loads(message)["session"])
-    chat_id = try_to_int(json.loads(message)["chat_id"])
-    password = json.loads(message)["password"]
-    if sessionid is None or chat_id is None:
+    message = json.loads(message)
+    sessionHash = message["sessionHash"]
+    user_id = try_to_int(message["user_id"])
+    chat_id = try_to_int(message["chat_id"])
+    if sessionHash is None or chat_id is None:
         return None, None
-    user_temp = db.find_user_by_sessionid(sessionid)
+    user_temp = db.find_user_by_sessionid(user_id, sessionHash)
     if not user_temp:
         return None, None
-    chat = db.get_chats_by_user(user_id=user_temp.id, chat_id=chat_id)
-    if chat is None or chat.secure == Chat.Type.SECURE and chat.password != password:
-        return None, None
-    else:
-        session_chat = find_first(lambda sc: sc.chat.id == chat.id, SESSION_CHATS)
-        if session_chat is None:
-            chat_extended = db.get_chats_by_user(user_id=user_temp.id, chat_id=chat_id, is_messages=True, is_users=True)
-            session_chat = SessionChat(chat_extended)
-            async with lock:
-                SESSION_CHATS.append(session_chat)
-        user = find_first(lambda u: u.id == user_temp.id, session_chat.chat.users)
-        if user is None:
-            user = user_temp
-            session_chat.chat.users.append(user)
 
-        user_info = await session_chat.connect_chat(websocket, user)
-        return session_chat, user_info
+    chat = db.get_chats_by_user(user_id=user_temp.id, chat_id=chat_id)
+    session_chat = find_first(lambda sc: sc.chat.id == chat.id, SESSION_CHATS)
+    if session_chat is None:
+        chat_extended = db.get_chats_by_user(user_id=user_temp.id, chat_id=chat_id, is_messages=True, is_users=True)
+        session_chat = SessionChat(chat_extended)
+        async with lock:
+            SESSION_CHATS.append(session_chat)
+    user = find_first(lambda u: u.id == user_temp.id, session_chat.chat.users)
+    is_new_user = False
+    if user is None:
+        is_new_user = True
+        user = user_temp
+        session_chat.chat.users.append(user)
+
+    user_info = await session_chat.connect_chat(websocket, user, is_new_user)
+    return session_chat, user_info
 
 
 async def unregister(websocket, session_chat, user_info):
@@ -171,7 +179,7 @@ async def unregister(websocket, session_chat, user_info):
         if not session_chat.USERS:
             async with lock:
                 SESSION_CHATS.remove(session_chat)
-    print('current_sessions(after unregister):', len(SESSION_CHATS))
+    # print('current_sessions(after unregister):', len(SESSION_CHATS))
 
 
 async def action_loop(websocket, path):

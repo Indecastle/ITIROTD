@@ -26,6 +26,9 @@ inner join roles on users_has_roles.roles_id = roles.id;
 
 SELECT * FROM users_has_roles WHERE users_id=13;
 
+SELECT users.* FROM chat_has_users
+INNER JOIN users on chat_has_users.users_id = users.id
+WHERE chat_has_users.chat_id=5;
 
 
 INSERT INTO chat (name, secure, password) VALUES ("first_chat", 2, "123456");
@@ -33,5 +36,18 @@ INSERT INTO chat (name, secure, password) VALUES ("first_chat", 2, "123456");
 INSERT INTO chat_has_users (chat_id, users_id) VALUES (7, 37);
 
 SELECT users.* FROM chat_has_users
-inner join users on chat_has_users.users_id=users.id
+INNER JOIN users on chat_has_users.users_id!=users.id
 WHERE chat_id=1;
+
+SELECT chat.* FROM chat_has_users
+INNER JOIN users on chat_has_users.users_id = users.id
+INNER JOIN chat on chat_has_users.chat_id = chat.id
+WHERE users.id=3;
+
+
+SELECT chat.* FROM chat
+WHERE chat.id not in (
+	SELECT chat.id FROM chat_has_users
+	INNER JOIN users on chat_has_users.users_id = users.id
+	INNER JOIN chat on chat_has_users.chat_id = chat.id
+	WHERE users.id=3);

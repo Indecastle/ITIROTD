@@ -21,7 +21,10 @@ def myauth_login_POST(request):
 
     user = find_user(login=login)
     if user is not None:
-        if user.password == password:
+        valid_pass = bytes.fromhex(user.password)
+        salt, valid_key = valid_pass[:32], valid_pass[32:]
+        key = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
+        if valid_key == key:
             create_session(request, user.login, user.id)
             return redirect_to(request, '/')
     else:
@@ -39,7 +42,12 @@ def myauth_register_POST(request):
     user = find_user(login=login)
     if user is None:
         photopath = save_photo(photodata)
-        user_id = create_user(login, password, nickname, photopath)
+
+        salt = os.urandom(32)
+        key = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
+        password2 = (salt + key).hex()
+
+        user_id = create_user(login, password2, nickname, photopath)
         create_session(request, login, user_id)
         return redirect_to(request, '/')
     else:

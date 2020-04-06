@@ -1,0 +1,28 @@
+<% base = 'shared/base.html' %>
+<% base_vars['title'] = 'Enjoy Chat' %>
+
+<div class="container2">
+    <div class="form-style-5">
+        <form action="/chat/enjoy_chat" method="post">
+            <fieldset>
+                <legend><span class="number">1</span> Enjoy</legend>
+                <input type="hidden" required name="chat_id" value="<%= chat.id %>">
+                <% if chat.secure == models.Chat.Type.SECURE: %>
+                    <input id="createchat_password" type="text" name="pass" placeholder="Password">
+                <% end %>
+
+            </fieldset>
+            <input type="submit" value="Apply"/>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let tag_form = document.getElementById("createchat_form");
+    let tag_select = document.getElementById("createchat_select");
+    let tag_password = document.getElementById("createchat_password");
+
+    tag_select.onchange = () => {
+        tag_password.style = tag_select.value === "PUBLIC" ? "display: none;" : '';
+    };
+</script>

@@ -1,8 +1,10 @@
 import PythonInsideHtml36 as pih
+import models
 
 args = {
     'link_for': lambda s: "/static/" + s,
-    'message': ''
+    'message': '',
+    'models': models
 }
 
 
@@ -14,7 +16,7 @@ def render_template(request, file, **kwargs):
     e.update(**kwargs)
 
     exec(code, e)
-    print(e.keys())
+    # print(e.keys())
     if 'base' in e:
         return render_template(request, e["base"], body=e["py_code"].getvalue(), base_vars=e["base_vars"])
     else:

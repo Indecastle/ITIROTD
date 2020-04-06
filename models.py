@@ -38,9 +38,11 @@ class User:
 
 
 class Session:
-    def __init__(self, id, user_id):
+    def __init__(self, id, user_id, hash, when):
         self.id = id
         self.user_id = user_id
+        self.when = when
+        self.hash = hash
         self.user = None
 
 
