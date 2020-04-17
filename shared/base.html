@@ -7,7 +7,7 @@
     </title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/static/sun.ico"/>
+    <link rel="shortcut icon" href="/static/boat.jpg"/>
     <link rel="stylesheet" href="<%= link_for('css/styles.css') %>">
     <link rel="stylesheet" href="/static/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -22,7 +22,7 @@
     <a href="javascript:void(0);" class="nav-toggle" onclick="menu_toogle()">
         <i class="fa fa-bars"></i>
     </a>
-    <a href="/" class="logo">CompanyLogo</a>
+    <a href="/" class="logo">WebChat</a>
     <div class="sub_headers" id="myheader">
         <div class="header-left">
             <a href="/chat/chat">chat</a>
@@ -38,15 +38,15 @@
                 <a href="/auth/logout">LogOut</a>
             <% end %>
             <% else: %>
-                <a href="/auth/">Register</a>
-                <a href="/auth/">Login</a>
+                <a href="/auth/register">Register</a>
+                <a href="/auth/login">Login</a>
             <% end %>
         </div>
     </div>
 
 </div>
 
-<div style="padding-left:20px; height: auto;">
+<div style="padding-left:0; height: auto;">
 
     <%= body %>
 

@@ -8,7 +8,7 @@ from error import *
 from db import create_user, find_user
 
 
-@route('auth')
+@route('auth/login')
 def myauth(request, **kwargs):
     kwargs.setdefault('message', '')
     return render_template(request, 'templates/auth/login.html', **kwargs)
@@ -32,6 +32,12 @@ def myauth_login_POST(request):
 
     kwargs = {'message': "Not valid user"}
     return render_template(request, 'templates/auth/login.html', **kwargs)
+
+
+@route('auth/register')
+def myauth(request, **kwargs):
+    kwargs.setdefault('message', '')
+    return render_template(request, 'templates/auth/register.html', **kwargs)
 
 
 @route('/auth/register', method=Method.POST)

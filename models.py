@@ -65,7 +65,7 @@ class Chat:
 
 
 class Message:
-    def __init__(self, id, chat_id, user_id, when, text):
+    def __init__(self, id, chat_id, user_id, when, text, isreaded=True):
         self.id = id
         self.chat_id = chat_id
         self.user_id = user_id
@@ -73,10 +73,11 @@ class Message:
         self.text = text
 
         self.user = None
+        self.isreaded = isreaded
 
     def to_dict(self):
         return {'id': self.id, 'user_id': self.user_id, 'when': self.when, 'text': self.text,
-                'is_reading': None}
+                'isreaded': self.isreaded}
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ var user_list = document.querySelector('#user_list'),
     my_form = document.querySelector('#my_form'),
     text_message = document.querySelector('#text_message'),
     p_is_reading = document.querySelector('#form_p'),
-    websocket = new WebSocket("wss://192.168.100.3:6789/"),
+    websocket = new WebSocket("wss://localhost:6789/"),
     all_messages = [],
     online_users = [],
     all_users = [],
@@ -70,23 +70,25 @@ function render_message(message, user, is_new_message, uuid = 'invalid') {
         div.appendChild(div2);
         chat_list.appendChild(div);
 
-        if (message.id === null)
-            message.id = uuid;
         message['dom_element'] = div2;
         all_messages.push(message);
 
         if (is_new_message === true) {
+            message.id = uuid;
             div2.id = 'new_message_' + uuid;
             div2.classList.add("chatbox_nosend");
             // div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
         } else {
             div2.id = 'message_' + message.id;
         }
+
+        if (message.isreaded === false)
+            div2.classList.add('chatbox_noreaded')
     }
 }
 
 function action_onfocus(user_id) {
-    var filter_messages = all_messages.filter(mes => mes.user_id === my_user.id);
+    var filter_messages = all_messages; //.filter(mes => mes.user_id === my_user.id);
     var user = online_users.find(user => user.id === user_id);
     if (my_user.id !== user_id) {
         filter_messages.forEach(mes => mes.dom_element.classList.remove('chatbox_noreaded'));
