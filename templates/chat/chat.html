@@ -1,45 +1,208 @@
 <% base = 'shared/base.html' %>
 
-<div class='container' ng-cloak ng-app="chatApp">
-    <h1>Chatbox</h1>
-    <div class='chatbox' ng-controller="MessageCtrl as chatMessage">
-        <div class='chatbox__user-list'>
-            <h1>User list</h1>
-            <div id="user_list">
-                <div class='chatbox__user--active'>
-                    <p>Jack Thomson</p>
+<div class="chat-container chat-clearfix">
+    <div class="chat-people-list" id="people-list" style="width: 0px;">
+        <div class="search">
+            <form id="chat_form_users">
+                <input type="text" name="text_message" placeholder="search"/>
+                <input type="submit" name="button" hidden>
+                <i class="fa fa-search"></i>
+            </form>
+        </div>
+        <ul class="list" id="user_list">
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Vincent Porter</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i><span>online</span>
+                    </div>
                 </div>
-                <div class='chatbox__user--busy'>
-                    <p>Angelina Jolie</p>
-                </div>
-                <div class='chatbox__user--active'>
-                    <p>George Clooney</p>
-                </div>
-                <div class='chatbox__user--active'>
-                    <p>Seth Rogen</p>
-                </div>
-                <div class='chatbox__user--away'>
-                    <p>John Lydon</p>
-                </div>
-            </div>
+            </li>
 
-        </div>
-        <div id="chat_list" class="chatbox__messages" ng-repeat="message in messages"
-             style="overflow-x: hidden; overflow-y: scroll; height: 100%;">
-            <div class="chatbox__messages__user-message">
-                <div class="chatbox__messages__user-message--ind-message">
-                    <p class="name">{{message.Name}}</p>
-                    <br/>
-                    <p class="message">{{message.Message}}</p>
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_02.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Aiden Chavez</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-offline"></i> left 7 mins ago
+                    </div>
                 </div>
-            </div>
-        </div>
-        <form id="my_form">
-            <p style="color: black;" id="form_p">kek</p>
-            <input id="text_message" required name="form_message" type="text" placeholder="Enter your message">
-        </form>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_03.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Mike Thomas</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i> online
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_04.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Erica Hughes</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i> online
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_05.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Ginger Johnston</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i> online
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_06.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Tracy Carpenter</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-offline"></i> left 30 mins ago
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_07.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Christian Kelly</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-offline"></i> left 10 hours ago
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_08.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Monica Ward</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i> online
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_09.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Dean Henry</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-offline"></i> offline since Oct 28
+                    </div>
+                </div>
+            </li>
+
+            <li class="chat-clearfix">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_10.jpg" alt="avatar"/>
+                <div class="chat-about">
+                    <div class="chat-name">Peyton Mckinney</div>
+                    <div class="chat-status">
+                        <i class="fa fa-circle chat-online"></i> online
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
-</div>
+
+    <div class="chat" id="chat">
+        <div class="chat-header chat-clearfix" id="chat_header">
+            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg" alt="avatar"/>
+
+            <div class="chat-about">
+                <div class="chat-with">Chat with Vincent Porter</div>
+                <div class="chat-num-messages" id="already_messages">already 1 902 messages</div>
+            </div>
+            <i class="fa fa-bars" id="chat-nav-button" onclick="toggleNav()"></i>
+        </div> <!-- end chat-header -->
+
+        <div class="chat-history2">
+            <div class="chat-history">
+                <ul id="chat_list">
+                    <li class="chat-clearfix">
+                        <div class="chat-message-data chat-align-right">
+                            <span class="chat-message-data-time">10:10 AM, Today</span> &nbsp; &nbsp;
+                            <span class="chat-message-data-name">Olia</span> <i class="fa fa-circle chat-me"></i>
+
+                        </div>
+                        <div class="chat-message chat-other-message chat-float-right">
+                            Hi Vincent, how are you? How is the project coming along?
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="chat-message-data">
+                            <span class="chat-message-data-name"><i class="fa fa-circle chat-online"></i> Vincent</span>
+                            <span class="chat-message-data-time">10:12 AM, Today</span>
+                        </div>
+                        <div class="chat-message chat-my-message">
+                            Are we meeting today? Project has been already finished and I have results to show you.
+                        </div>
+                    </li>
+
+                    <li class="chat-clearfix">
+                        <div class="chat-message-data chat-align-right">
+                            <span class="chat-message-data-time">10:14 AM, Today</span> &nbsp; &nbsp;
+                            <span class="chat-message-data-name">Olia</span> <i class="fa fa-circle chat-me"></i>
+
+                        </div>
+                        <div class="chat-message chat-other-message chat-float-right">
+                            Well I am not sure. The rest of the team is not here yet. Maybe in an hour or so? Have you
+                            faced
+                            any problems at the last phase of the project?
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="chat-message-data">
+                            <span class="chat-message-data-name"><i class="fa fa-circle chat-online"></i> Vincent</span>
+                            <span class="chat-message-data-time">10:20 AM, Today</span>
+                        </div>
+                        <div class="chat-message chat-my-message">
+                            Actually everything was fine. I'm very excited to show this to our team.
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="chat-message-data">
+                            <span class="chat-message-data-name"><i class="fa fa-circle chat-online"></i> Vincent</span>
+                            <span class="chat-message-data-time">10:31 AM, Today</span>
+                        </div>
+                        <i class="fa fa-circle chat-online"></i>
+                        <i class="fa fa-circle chat-online" style="color: #AED2A6"></i>
+                        <i class="fa fa-circle chat-online" style="color:#DAE9DA"></i>
+                    </li>
+
+                </ul>
+
+            </div> <!-- end chat-history -->
+        </div>
+
+        <div class="chat-message chat-clearfix">
+            <form id="my_form">
+                <textarea name="form_message" id="text_message" placeholder="Type your message"
+                          rows="3"></textarea>
+
+                <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
+                <i class="fa fa-file-image-o"></i>
+                <span id="form_p"></span>
+
+                <button id="form_button">Send</button>
+            </form>
+
+
+        </div> <!-- end chat-message -->
+
+    </div> <!-- end chat -->
+
+</div> <!-- end container -->
 
 
 <script src="../static/js/chat.js"></script>

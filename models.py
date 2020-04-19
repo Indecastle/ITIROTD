@@ -34,7 +34,7 @@ class User:
 
     def to_dict(self):
         return {'id': self.id, 'login': self.login, 'nickname': self.nickname, 'email': self.email,
-                'is_reading': self.is_reading}
+                'is_reading': self.is_reading, 'photopath': self.photopath}
 
 
 class Session:
