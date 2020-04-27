@@ -45,6 +45,8 @@ def generate_headers(request, method, url):
 
         else:
             code = 404
+    elif re.match(r'^/json', url):
+        content_type = 'text/json'
     else:
         if method == 'GET' and url not in URLS:
             code = 404

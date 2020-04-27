@@ -63,6 +63,9 @@ class Chat:
         self.log_users = log_users
         self.messages = messages
 
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name}
+
 
 class Message:
     def __init__(self, id, chat_id, user_id, when, text, isreaded=True):

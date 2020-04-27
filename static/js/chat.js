@@ -221,6 +221,7 @@ websocket.onmessage = function (event) {
             if (data.is_focus) {
             }
             my_user = data.user;
+            already_messages.innerHTML = "already 0 messages";
             init_myuser();
             break;
         case 'all_users':

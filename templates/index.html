@@ -1,25 +1,14 @@
 <% base = 'shared/base.html' %>
 <% base_vars['title'] = 'Index Title' %>
 
-<center>
-    Rendered in: <%= time.time() - debug_start_time %>s
 
-</center>
 <div class="container2">
-    <form action="/blog" method="post">
-        <p><b>Как по вашему мнению расшифровывается аббревиатура &quot;ОС&quot;?</b></p>
-        <p><input type="radio" name="answer" value="a1">Офицерский состав<Br>
-            <input type="radio" name="answer" value="a2">Операционная система<Br>
-            <input type="radio" name="answer" value="a3">Большой полосатый мух</p>
-        <p><input type="submit"></p>
-
-
-    </form>
-    <br>
-    <form action="/index_POST" enctype="multipart/form-data" method="post">
-        <p>Загрузите ваши фотографии на сервер</p>
-        <input type="text" name="username" placeholder="username"/>
-        <p><input type="file" name="photo" multiple accept="image/*,image/jpeg">
-            <input type="submit" value="Отправить"></p>
-    </form>
+    <div class="col-md-9">
+        <h1>Welcome to my WebChat</h1>
+    </div>
+    <div class="col-md-3">
+        <a href="/auth/login" class="index-btn index-block index-teal">login</a>
+        <br>
+        <a href="/auth/register" class="index-btn index-block index-blue">register</a>
+    </div>
 </div>

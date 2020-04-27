@@ -11,18 +11,18 @@ html, body {
     box-sizing: border-box;
 }
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-}
+/*html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    border: 0;*/
+/*    font-size: 100%;*/
+/*    font: inherit;*/
+/*    vertical-align: baseline;*/
+/*}*/
 
 html, body {
     background: #C5DDEB;
-    font: 14px/20px "Lato", Arial, sans-serif;
+    font: 14px "Lato", Arial, sans-serif;
     /*padding: 40px 0;*/
     /*color: white;*/
     height: 100%;
@@ -110,15 +110,15 @@ body {
 }
 
 .chat .chat-header {
-    padding: 20px;
+    padding: 5px 20px;
     border-bottom: 2px solid white;
 }
 
 .chat .chat-header img {
     float: left;
     border-radius: 100%;
-    width: 55px;
-    height: 55px;
+    width: 40px;
+    height: 40px;
 }
 
 .chat .chat-header .chat-about {
@@ -199,15 +199,16 @@ body {
 }
 
 .chat .chat-message {
-    padding: 30px;
+    padding: 5px;
 }
 
 .chat .chat-message textarea {
     width: 100%;
     border: none;
-    padding: 10px 20px;
+    padding: 3px 20px;
+    padding-left: 0px;
     font: 14px/22px "Lato", Arial, sans-serif;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     border-radius: 5px;
     resize: none;
 }
@@ -273,6 +274,7 @@ body {
 
 .chat-container ol, .chat-container ul {
     list-style: none;
+    padding: 0px;
 }
 
 .chat-about .chat-name {
@@ -299,11 +301,11 @@ body {
 
 .chat-people-list {
     background: #444753;
-    height: calc(100% - 50px);
+    height: calc(100% - 40px);
     width: 250px;
     /*position: fixed;*/
     z-index: 1;
-    top: 50px;
+    top: 40px;
     left: 0;
     overflow-x: hidden;
     transition: 0.5s;
@@ -343,15 +345,15 @@ body {
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    padding-top: 67px;
-    padding-bottom: 20px;
+    padding-top: 40px;
+    padding-bottom: 0px;
 }
 
 .header {
     overflow: hidden;
     background-color: #dadada;
-    padding: 8px 10px;
-    padding-bottom: 10px;
+    padding: 0px 10px 3px 10px;
+    padding-bottom: 3px;
     position: fixed;
     top: 0;
     right: 0;
@@ -363,7 +365,8 @@ body {
     float: left;
     color: black;
     text-align: center;
-    padding: 12px;
+    padding: 3px 8px;
+    margin-top: 5px;
     text-decoration: none;
     font-size: 18px;
     line-height: 25px;
@@ -374,6 +377,7 @@ body {
     font-size: 25px;
     font-weight: bold;
     width: fit-content;
+    margin-top: 4px;
 }
 
 .header a:hover {
@@ -405,7 +409,7 @@ body {
 
 @media screen and (max-width: 775px) {
     .header {
-        padding-bottom: 0;
+        /*padding-bottom: 0;*/
     }
 
     .header a {
@@ -419,9 +423,9 @@ body {
     }
 
     .sub_headers {
-        margin-top: 5px;
+        /*margin-top: 5px;*/
         /* margin-bottom: 0px; */
-        padding-top: 5px;
+        /*padding-top: 5px;*/
         float: none;
         height: 0;
         overflow: hidden;
@@ -438,7 +442,7 @@ body {
 
     .nav-toggle {
         position: absolute;
-        top: 10px;
+        top: 1px;
         right: 20px;
         cursor: pointer;
         color: rgba(255, 255, 255, 0.8);
@@ -446,7 +450,7 @@ body {
     }
 
     .sub_headers.responsive {
-        height: 245px;
+        height: 151px;
     }
 }
 
@@ -642,3 +646,52 @@ body {
 }
 
 /*=============================================*/
+
+
+/*===================== button-index ========================*/
+
+.index-btn {
+    border: none;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 8px 16px;
+    vertical-align: middle;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    background-color: inherit;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: large;
+    transition: 0.2s;
+}
+
+.index-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.index-btn.index-block {
+    display: block;
+    width: 100%;
+}
+
+.index-btn.index-teal {
+    color: #fff !important;
+    background-color: #009688 !important;
+}
+
+.index-btn.index-blue {
+    color: #fff !important;
+    background-color: #005a96 !important;
+}
+
+.index-btn.index-btn:hover {
+    color: #000 !important;
+    background-color: #ccc !important;
+}

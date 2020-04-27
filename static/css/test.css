@@ -88,13 +88,13 @@ html, body {
 
 
 .profile-sidebar {
-    padding: 20px 0 10px 0;
+    padding: 1px 0 10px 0;
     background: #fff;
 }
 
 .profile-usertitle {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .profile-usertitle-name {

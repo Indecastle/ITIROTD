@@ -30,8 +30,8 @@ def execute(request, args=None, limit=None):
                 raise Exception('InterfaceError')
 
 
-def select_rows(name_table, columns='*', where='', limit=None):
-    return execute(f'SELECT {columns} FROM {name_table} {where};', limit=limit)
+def select_rows(name_table, columns='*', where='', limit=''):
+    return execute(f'SELECT {columns} FROM {name_table} {where} {limit};')
 
 
 def convert_to_user(row, roles):
@@ -41,7 +41,7 @@ def convert_to_user(row, roles):
     return user
 
 
-def get_users(limit=None, where=''):
+def get_users(limit='', where=''):
     users = select_rows('users', columns='id, login, password, name, photopath, email', where=where, limit=limit)
     if users and users[1]:
         users_obj = []
@@ -144,7 +144,7 @@ def create_message(chat_id, user_id, when, text):
             return cursor.lastrowid
 
 
-def get_messages(chat_id, limit=None):
+def get_messages(chat_id, limit=''):
     messages_ref = select_rows('messages', columns='id, chat_id, users_id, `when`, text',
                                where='WHERE chat_id=%s' % chat_id, limit=limit)
     if messages_ref and messages_ref[1]:
@@ -201,7 +201,7 @@ def _get_chats_sql(chats_sql, is_messages=False, is_users=False, limit=None):
     return None
 
 
-def get_chats(limit=None, where='', is_messages=False, is_users=False):
+def get_chats(limit='', where='', is_messages=False, is_users=False):
     chats = select_rows('chat', columns='id, name, secure, password', where=where, limit=limit)
     return _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
 
