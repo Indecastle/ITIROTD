@@ -6,9 +6,12 @@
     <div class="col-md-9">
         <h1>Welcome to my WebChat</h1>
     </div>
-    <div class="col-md-3">
-        <a href="/auth/login" class="index-btn index-block index-teal">login</a>
-        <br>
-        <a href="/auth/register" class="index-btn index-block index-blue">register</a>
-    </div>
+    <% if not request.auth_is: %>
+        <div class="col-md-3">
+            <a href="/auth/login" class="index-btn index-block index-teal">login</a>
+            <br>
+            <a href="/auth/register" class="index-btn index-block index-blue">register</a>
+        </div>
+    <% end %>
+
 </div>

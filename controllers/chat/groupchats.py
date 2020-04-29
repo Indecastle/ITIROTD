@@ -35,7 +35,7 @@ def chat_createchat(request, **kwargs):
 def chat_createchat_POST(request):
     query = request.POST_query
     print('query_post: ', query)
-    name, type_chat, password, users = query['name'][0], query['type'][0], query['password'][0], query.get('users', [])
+    name, type_chat, password = query.get2('name'), query.get2('type'), query.get2('password')
 
     if not name or \
             not type_chat or \
@@ -47,8 +47,6 @@ def chat_createchat_POST(request):
     user = request.auth_get_user()
     secure = models.Chat.Type[type_chat].value
     chat_id = db.create_chat(name, secure, password, user.id)
-    for user_id in users:
-        db.add_user_to_chat(chat_id, user_id)
     # db.add_user_to_chat(chat_id, user.id)
 
     newquery = {'chat_id': chat_id}

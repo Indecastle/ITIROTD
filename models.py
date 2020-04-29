@@ -32,6 +32,14 @@ class User:
     def get_email(self):
         return self.email if self.email else ''
 
+    def update(self, data):
+        self.id = data.get('id', self.id)
+        self.login = data.get('login', self.login)
+        self.password = data.get('password', self.password)
+        self.nickname = data.get('nickname', self.nickname)
+        self.email = data.get('email', self.email)
+        self.photopath = data.get('photopath', self.photopath)
+
     def to_dict(self):
         return {'id': self.id, 'login': self.login, 'nickname': self.nickname, 'email': self.email,
                 'is_reading': self.is_reading, 'photopath': self.photopath}
@@ -64,7 +72,7 @@ class Chat:
         self.messages = messages
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name}
+        return {'id': self.id, 'name': self.name, 'type': self.secure.name}
 
 
 class Message:

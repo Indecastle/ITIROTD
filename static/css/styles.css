@@ -1,14 +1,20 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700);
 
-html, body {
-    /*background: linear-gradient(120deg, rgba(23, 190, 187, 1), rgba(240, 166, 202, 1));*/
-    background-color: #ececec;
-}
-
-/*============== chat ==================*/
-
 *, *:before, *:after {
     box-sizing: border-box;
+}
+
+html, body {
+    font: 14px "Lato", Arial, sans-serif;
+    background: #f1f3fa;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-top: 38px;
+    padding-bottom: 0px;
 }
 
 /*html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {*/
@@ -20,29 +26,17 @@ html, body {
 /*    vertical-align: baseline;*/
 /*}*/
 
-html, body {
-    background: #C5DDEB;
-    font: 14px "Lato", Arial, sans-serif;
-    /*padding: 40px 0;*/
-    /*color: white;*/
-    height: 100%;
-    margin: 0;
-}
-
-body {
-    padding-top: 50px;
-}
+/*============== chat ==================*/
 
 .chat-container {
     margin: 0 auto;
     max-width: 750px;
-    background: #444753;
     border-radius: 5px;
     display: flex;
 }
 
 .chat-people-list {
-    width: 260px;
+    width: 235px;
     float: left;
 }
 
@@ -72,11 +66,12 @@ body {
     /*height: 770px;*/
     overflow-y: inherit;
     flex: 1;
-    width: 250px;
+    width: 235px;
 }
 
 .chat-people-list ul li {
     padding-bottom: 20px;
+    margin-left: 20px;
 }
 
 .chat-people-list img {
@@ -206,7 +201,7 @@ body {
     width: 100%;
     border: none;
     padding: 3px 20px;
-    padding-left: 0px;
+    padding-left: 5px;
     font: 14px/22px "Lato", Arial, sans-serif;
     margin-bottom: 0px;
     border-radius: 5px;
@@ -228,6 +223,7 @@ body {
     cursor: pointer;
     font-weight: bold;
     background: #F2F5F8;
+    margin-right: 10px;
 }
 
 .chat .chat-message button:hover {
@@ -301,11 +297,11 @@ body {
 
 .chat-people-list {
     background: #444753;
-    height: calc(100% - 40px);
-    width: 250px;
+    height: 100%;
+    width: 235px;
     /*position: fixed;*/
     z-index: 1;
-    top: 40px;
+    top: 38px;
     left: 0;
     overflow-x: hidden;
     transition: 0.5s;
@@ -323,10 +319,28 @@ body {
     overflow-y: auto;
 }
 
+.chat .chat-history .fa-circle.chat_message_noreaded {
+    color: #a0ab9c;
+}
+.chat .chat-history .fa-circle.chat_message_nosend {
+    color: #6d2532;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(149, 149, 149, 0.24);
+  border-radius: 10px;
+}
 
 @media screen and (max-width: 750px) {
     .chat-people-list {
         position: fixed;
+        height: calc(100% - 38px);
     }
 
     .chat-container {
@@ -342,12 +356,7 @@ body {
 
 /* ==================== NAV ========================= */
 
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    padding-top: 40px;
-    padding-bottom: 0px;
-}
+
 
 .header {
     overflow: hidden;
@@ -366,7 +375,7 @@ body {
     color: black;
     text-align: center;
     padding: 3px 8px;
-    margin-top: 5px;
+    margin-top: 4px;
     text-decoration: none;
     font-size: 18px;
     line-height: 25px;
@@ -694,4 +703,111 @@ body {
 .index-btn.index-btn:hover {
     color: #000 !important;
     background-color: #ccc !important;
+}
+
+
+/*=============================================*/
+
+
+/*===================== list-chats-table ========================*/
+
+
+.list-chats-table {
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 14px;
+    /*background: white;*/
+    border-collapse: collapse;
+    text-align: left;
+    /*margin: 0 0 auto 20px;*/
+    width: 100%;
+    max-width: 600px;
+    table-layout: fixed;
+    white-space: nowrap;
+    margin: 0 auto;
+}
+
+.list-chats-table tbody {
+    height: 200px;
+}
+
+.list-chats-table th {
+    font-size: 14px;
+    font-weight: normal;
+    color: #039;
+    padding: 10px 5px;
+    border-bottom: 2px solid #6678b1;
+}
+
+.list-chats-table tr {
+    width: 50px;
+}
+
+.list-chats-table td {
+    color: #669;
+    border-top: 1px solid #e8edff;
+    padding: 10px 5px;
+    transition: .3s linear;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-chats-table td:first-child, .list-chats-table th:first-child {
+    width: 50px;
+}
+
+.list-chats-table td:nth-child(2), .list-chats-table th:nth-child(2) {
+    /*width: 50px;*/
+}
+
+.list-chats-table td:last-child, .list-chats-table th:last-child {
+    width: 100px;
+}
+
+.list-chats-table td.td-private {
+    color: #d21818;
+}
+
+.list-chats-table td.td-public {
+    color: green;
+}
+
+.list-chats-table tr:hover td {
+    background: #e8edff;
+}
+
+.list-chats-search {
+    /*padding: 20px;*/
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.list-chats-search input[type="text"] {
+    border-radius: 3px;
+    border: none;
+    padding: 14px;
+    color: white;
+    background: #d3d4d8;
+    width: 90%;
+    font-size: 14px;
+    flex: 1;
+}
+
+.list-chats-search .fa-search {
+    position: relative;
+    left: -25px;
+    color: white;
+    margin: auto 0;
+}
+
+.list-chats-search form {
+    display: flex;
+}
+
+.list-chats-search input[type="checkbox"]{
+    margin: auto  0;
+}
+
+.list-chats-search label {
+    margin: auto 5px auto 0;
 }

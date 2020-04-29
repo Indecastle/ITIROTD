@@ -12,7 +12,9 @@ def chat(request):
     # chat_id, chat_password = request.query_get('chat_id'), request.query_get('chat_id')
     chat_id = query.get2('chat_id')
     if chat_id is None or try_to_int(chat_id) is None:
-        return redirect_to(request, '/')
+        request.response.code = 404
+        return my_error(request, message=("chat", "bad chat_id"))
+        # return redirect_to(request, '/')
     chat = db.find_chat({'id': chat_id})
     if chat is None:
         request.response.code = 404

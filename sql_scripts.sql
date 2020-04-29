@@ -42,12 +42,11 @@ WHERE chat_id=1;
 SELECT chat.* FROM chat_has_users
 INNER JOIN users on chat_has_users.users_id = users.id
 INNER JOIN chat on chat_has_users.chat_id = chat.id
-WHERE users.id=3;
-
+WHERE users.id=1;
 
 SELECT chat.* FROM chat
 WHERE chat.id not in (
 	SELECT chat.id FROM chat_has_users
-	INNER JOIN users on chat_has_users.users_id = users.id
 	INNER JOIN chat on chat_has_users.chat_id = chat.id
-	WHERE users.id=3);
+	WHERE users_id=1)
+    AND chat.name LIKE "%%" LIMIT 1000;

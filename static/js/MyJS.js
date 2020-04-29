@@ -1,3 +1,20 @@
+function find_cookie(key) {
+    let cookie = document.cookie.split(';');
+    let find_el = cookie.find((item) => item.trim().startsWith(key + '='));
+    if (find_el !== undefined)
+        return find_el.split('=', 2)[1];
+    return undefined;
+}
+
+var getJSON = function (url, callback) {
+    fetch(url, {credentials: 'include'})
+        .then(res => res.json())
+        .then(callback)
+        .catch(err => {
+            throw err
+        });
+}
+
 function menu_toogle() {
     var x = document.getElementById("myheader");
     if (x.className === "sub_headers") {
@@ -57,14 +74,15 @@ function initNotifications() {
         // alert("Your browser doesn't support Notifications API");
     }
 }
-
-function showNotification(title, message, tag='tag') {
+var notification_test_counter = 0
+function showNotification(title, message, tag = 'tag') {
     if (notificationsEnabled) {
+        notification_test_counter++;
         var notification = new Notification(title, {
             body: message,
             // icon: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             vibrate: [200, 100, 200],
-            tag: tag,
+            tag: tag+notification_test_counter,
             // image: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             badge: "/static/sun.ico",
             // actions: [{action: "Detail", title: "View", icon: "https://via.placeholder.com/128/ff0000"}]

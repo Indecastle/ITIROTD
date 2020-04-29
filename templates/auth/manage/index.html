@@ -8,7 +8,11 @@
     <form action="/auth/manage/change_profile" method="post" enctype="multipart/form-data">
         <fieldset>
             <legend><span class="number">1</span> Main Info</legend>
+            <label >login:</label>
+            <input type="text" readonly disabled placeholder="Your Name *" value="<%= user.login %>">
+            <label >nickname:</label>
             <input type="text" required name="name" placeholder="Your Name *" value="<%= user.nickname %>">
+            <label >email:</label>
             <input type="email" required name="email" placeholder="Your Email *" value="<%= user.get_email() %>">
 <!--            <textarea name="field3" placeholder="About yourself" style="resize: none;"></textarea>-->
 <!--            <label for="job">Interests:</label>-->

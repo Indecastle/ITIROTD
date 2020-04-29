@@ -1,10 +1,4 @@
-function find_cookie(key) {
-    let cookie = document.cookie.split(';');
-    let find_el = cookie.find((item) => item.trim().startsWith(key + '='));
-    if (find_el !== undefined)
-        return find_el.split('=', 2)[1];
-    return undefined;
-}
+
 
 function timeConverter(UNIX_timestamp) {
     var a = new Date(UNIX_timestamp * 1000);
@@ -53,23 +47,26 @@ my_form.onsubmit = function (event) {
     is_reading = false;
     let uuid = create_UUID();
     let text = text_message.value;
-    render_message({id: null, text: text, when: Date.now() / 1000}, my_user, true, uuid);
-    websocket.send(JSON.stringify({action: 'send_message', text: text, uuid: uuid}));
-    websocket.send(JSON.stringify({action: 'reading_message', is_reading: is_reading}));
-    text_message.value = '';
+    if (text.trim() !== '') {
+        render_message({id: null, text: text, when: Date.now() / 1000}, my_user, true, uuid);
+        websocket.send(JSON.stringify({action: 'send_message', text: text, uuid: uuid}));
+        websocket.send(JSON.stringify({action: 'reading_message', is_reading: is_reading}));
+        text_message.value = '';
+    }
     return false;
 };
 
 function render_message(message, user, is_new_message, uuid = 'invalid') {
-    let div = document.querySelector('#new_message_' + uuid);
-    if (div !== null) {
+    let li = document.querySelector('#new_message_' + uuid);
+    if (li !== null) {
+        let i = li.children[0].children[0];
         let finded_message = all_messages.find(mes => mes.id === uuid);
         Object.assign(finded_message, message);
-        div.id = 'message_' + message.id;
+        li.id = 'message_' + message.id;
         // div.style = '';
-        div.classList.remove("chatbox_nosend");
+        i.classList.remove("chat_message_nosend");
         if (user.id === my_user.id)
-            div.classList.add('chatbox_noreaded')
+            i.classList.add('chat_message_noreaded')
     } else {
         var is_bottom = parent_chat_list.scrollHeight - parent_chat_list.scrollTop === parent_chat_list.clientHeight;
 
@@ -113,19 +110,20 @@ function render_message(message, user, is_new_message, uuid = 'invalid') {
         chat_list.appendChild(n_li);
 
         message['dom_element'] = n_li;
+        message['dom_element_status'] = n_i;
         all_messages.push(message);
 
         if (is_new_message === true) {
             message.id = uuid;
             n_li.id = 'new_message_' + uuid;
-            n_li.classList.add("chatbox_nosend");
+            n_i.classList.add("chat_message_nosend");
             // div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
         } else {
             n_li.id = 'message_' + message.id;
         }
 
         if (message.isreaded === false)
-            n_li.classList.add('chatbox_noreaded')
+            n_i.classList.add('chat_message_noreaded')
 
         if (is_bottom)
             parent_chat_list.scrollTop = parent_chat_list.scrollHeight;
@@ -138,9 +136,8 @@ function action_onfocus(user_id) {
     var filter_messages = all_messages; //.filter(mes => mes.user_id === my_user.id);
     var user = online_users.find(user => user.id === user_id);
     if (my_user.id !== user_id) {
-        filter_messages.forEach(mes => mes.dom_element.classList.remove('chatbox_noreaded'));
+        filter_messages.forEach(mes => mes.dom_element_status.classList.remove('chat_message_noreaded'));
     }
-
 }
 
 function render_all_users() {
@@ -281,7 +278,7 @@ setInterval(function () {
 
 function toggleNav() {
     var el = document.getElementById("people-list");
-    el.style.width = el.style.width === '0px' ? '260px' : '0px';
+    el.style.width = el.style.width === '0px' ? '235px' : '0px';
 }
 
 function mediawidth(x) {
@@ -291,7 +288,7 @@ function mediawidth(x) {
         el.style.width = '0px';
         // el_button.style.display = '';
     } else {
-        el.style.width = '260px';
+        el.style.width = '235px';
         // el_button.style.display = 'none';
     }
 }

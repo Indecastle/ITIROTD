@@ -4,7 +4,7 @@ from tabulate import tabulate
 from models import *
 from pprint import pprint
 import threading, time, os, hashlib
-from helper import find_first, convert_args_to_querystr
+from helper import find_first, convert_args_to_querystr, B, N
 from config import DB
 
 lock = threading.RLock()
@@ -18,6 +18,7 @@ def Connect():
 
 
 def execute(request, args=None, limit=None):
+    print(B, request, N)
     with connection.cursor() as cursor:
         with lock:
             try:
@@ -206,15 +207,33 @@ def get_chats(limit='', where='', is_messages=False, is_users=False):
     return _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
 
 
-def get_chats_by_user(user_id, chat_id=None, is_messages=False, is_users=False, limit=None):
+def get_chats_by_user(user_id, chat_id=None, is_messages=False, is_users=False, limit='', where='', is_other=False):
     where_args = {'users_id': user_id}
-    if chat_id is not None:
-        where_args.update(chat_id=chat_id)
-    where_sql = convert_args_to_querystr(' AND ', query=where_args)
+    limit, limit2 = ('', limit) if isinstance(limit, int) else (limit, None)
+    if where:
+        if not is_other:
+            where_sql = f"users_id = {user_id} AND {where}"
+        else:
+            where_sql = where
+    else:
+        if chat_id is not None:
+            where_args.update(chat_id=chat_id)
+        where_sql = convert_args_to_querystr(' AND ', query=where_args)
 
-    chats = execute("SELECT chat.* FROM chat_has_users "
-                    "INNER JOIN chat on chat_has_users.chat_id=chat.id "
-                    f"WHERE {where_sql};", limit=limit)
+    if not is_other:
+        chats = execute("SELECT chat.* FROM chat_has_users "
+                        "INNER JOIN chat on chat_has_users.chat_id=chat.id "
+                        f"WHERE {where_sql} {limit};", limit=limit2)
+    else:
+        chats = execute(f"""
+        SELECT chat.* FROM chat
+        WHERE chat.id not in (
+            SELECT chat.id FROM chat_has_users
+            INNER JOIN users on chat_has_users.users_id = users.id
+            INNER JOIN chat on chat_has_users.chat_id = chat.id
+            WHERE users_id={user_id}) 
+            AND {where_sql} {limit};
+        """, limit=limit2)
     chats_obj = _get_chats_sql(chats, is_messages=is_messages, is_users=is_users)
 
     if chats_obj is not None and chat_id is None:

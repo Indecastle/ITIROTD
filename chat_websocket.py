@@ -10,6 +10,11 @@ logging.basicConfig()
 lock = asyncio.Lock()
 SESSION_CHATS = []
 
+def update_chat_user(user_id, user_dict):
+    for sc in SESSION_CHATS:
+        user = find_first(lambda u: u.id == user_id, sc.chat.users)
+        if user is not None:
+            user.update(user_dict)
 
 # datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -102,7 +107,7 @@ class SessionChat:
             await self.websocket_send(json_encoded)
 
     async def action_send_message(self, data, user_info):
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2.5)
         await self.action_window_onfocus(None, user_info)
         user = user_info.user
         text = data['text']
@@ -141,12 +146,6 @@ class SessionChat:
         if user_info.user.is_reading != is_reading:
             user_info.user.is_reading = is_reading
             await self.send_isreading(user_info)
-            # global_is_reading = any(user.is_reading for user in self.USERS)
-            # if self.is_reading != global_is_reading:
-            #     self.is_reading = global_is_reading
-            #     json_str = json.dumps(
-            #         {"type": "is_reading", "user": user_info.user.to_dict(), 'is_reading': self.is_reading})
-            #     await asyncio.wait([ui.websocket.send(json_str) for ui in self.USERS_INFO])
 
 
 async def register(websocket):

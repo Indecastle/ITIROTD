@@ -10,7 +10,7 @@ import ssl, threading
 from auth import get_auth
 from error import *
 from routes import *
-from helper import get_content_type
+from helper import get_content_type, G, N
 from chat_websocket import start_asyncio
 import db
 import models
@@ -19,13 +19,14 @@ import config
 import controllers
 
 
+
 def log_request(request):
     if request.auth_session is not None:
         user = request.auth_get_user()
-        print('Session_id: ', request.auth_session.user_id, ' |  user_id: ', user.id, ' |  login: ', user.login,
-              ' |  path: ', request.path)
+        print(G + 'Session_id: ', request.auth_session.user_id, ' |  user_id: ', user.id, ' |  login: ', user.login,
+              ' |  path: ', request.path + N)
     else:
-        print('null')
+        print(G + 'null' + N)
 
 
 def get_static_file(url):
@@ -45,9 +46,9 @@ def generate_headers(request, method, url):
 
         else:
             code = 404
-    elif re.match(r'^/json', url):
-        content_type = 'text/json'
     else:
+        if re.match(r'^/json', url):
+            content_type = 'application/json'
         if method == 'GET' and url not in URLS:
             code = 404
         elif method == 'POST' and url not in URLS_POST:
@@ -108,7 +109,7 @@ class Response:
         self.headers[key].append(value)
 
     def send_cookie(self, key, value, path='/'):
-        self.send_header('Set-Cookie', f"{key}={value}; path={path}")
+        self.send_header('Set-Cookie', f"{key}={value}; path={path}; expires=Thu, 01 Jan 2022 00:00:00 GMT")
 
     def remove_cookie(self, key):  # Set-Cookie: token=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT
         self.send_header('Set-Cookie', f"{key}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")
@@ -142,8 +143,8 @@ class CustomServer(BaseHTTPRequestHandler):
     def auth_get_user(self, none=None) -> models.User:
         if self.auth_session and self._auth_user is False:
             user = db.find_user(id=self.auth_session.user_id)
-            self.__auth_user = user if user else none
-        return self.__auth_user
+            self._auth_user = user if user else none
+        return self._auth_user
 
     def _set_headers(self):
         self.send_response(200)
