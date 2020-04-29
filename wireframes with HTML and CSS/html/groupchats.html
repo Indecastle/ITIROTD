@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./boat.jpg"/>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/styles2.css">
+</head>
+<body onload="initNotifications()">
+
+<div class="header">
+    <a href="javascript:void(0);" class="nav-toggle" onclick="menu_toogle()">
+        <i class="fa fa-bars"></i>
+    </a>
+    <a href="/" class="logo">WebChat</a>
+    <div class="sub_headers" id="myheader">
+        <div class="header-left">
+            <a href="/chat/groupchats">chats</a>
+            <a href="/chat/createchat">createchat</a>
+        </div>
+        <div class="header-right">
+            <a href="/auth/register">Register</a>
+            <a href="/auth/login">Login</a>
+        </div>
+    </div>
+
+</div>
+
+<div style="padding-left:0; height: 100%;">
+
+    <div class="container2">
+        <div class="list-chats-search">
+            <form id="search_form_listchats">
+                <input type="text" name="text_message" placeholder="search">
+                <input type="submit" name="button" hidden="">
+                <i class="fa fa-search"></i>
+                <label for="checkbox_other">other</label><input id="checkbox_other" name="checkbox_other"
+                                                                type="checkbox">
+
+            </form>
+        </div>
+
+        <table class="list-chats-table">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>type</th>
+            </tr>
+            </thead>
+            <tbody id="table_body">
+            <tr>
+                <td>1</td>
+                <td>chat_1</td>
+                <td class="td-public">PUBLIC</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>chat_2</td>
+                <td class="td-private">SECURE</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>chat_3</td>
+                <td class="td-public">SECURE</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<script src="./js/MyJS.js"></script>
+</body>
+</html>
+
+
+
+
+
+

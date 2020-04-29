@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./boat.jpg"/>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/styles2.css">
+</head>
+<body onload="initNotifications()">
+
+<div class="header">
+    <a href="javascript:void(0);" class="nav-toggle" onclick="menu_toogle()">
+        <i class="fa fa-bars"></i>
+    </a>
+    <a href="/" class="logo">WebChat</a>
+    <div class="sub_headers" id="myheader">
+        <div class="header-left">
+            <a href="/chat/groupchats">chats</a>
+            <a href="/chat/createchat">createchat</a>
+        </div>
+        <div class="header-right">
+            <a class="/*active*/" href="/auth/manage/">Hello #nickname</a>
+                <a href="/auth/logout">LogOut</a>
+        </div>
+    </div>
+
+</div>
+
+<div style="padding-left:0; height: 100%;">
+
+
+    <div class="container2">
+        <form action="/chat/createchat" method="post" id="createchat_form" onload="create_chat_form();">
+            <div class="form-style-5">
+                <fieldset>
+                    <legend><span class="number">1</span> Create Chat</legend>
+                    <input type="text" required name="name" placeholder="Name">
+                    <select id="createchat_select" name="type">
+                        <optgroup label="Type Safe">
+                            <option value="PUBLIC" selected>Public</option>
+                            <option value="SECURE">Secure</option>
+                        </optgroup>
+                    </select>
+                    <input id="createchat_password" type="text" name="password" placeholder="Password"
+                           style="display: none;">
+                </fieldset>
+                <input type="submit" value="Apply"/>
+            </div>
+            <%= message %>
+        </form>
+    </div>
+
+
+    <script type="text/javascript">
+        let tag_form = document.getElementById("createchat_form");
+        let tag_select = document.getElementById("createchat_select");
+        let tag_password = document.getElementById("createchat_password");
+
+        tag_select.onchange = () => {
+            tag_password.style = tag_select.value === "PUBLIC" ? "display: none;" : '';
+        };
+    </script>
+
+</div>
+
+
+<script src="/js/MyJS.js"></script>
+</body>
+</html>
+
