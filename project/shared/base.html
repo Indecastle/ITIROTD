@@ -10,22 +10,23 @@
     <link rel="shortcut icon" href="/static/boat.jpg"/>
     <link rel="stylesheet" href="<%= link_for('css/styles.css') %>">
     <link rel="stylesheet" href="/static/css/auth.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/styles2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+          integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
 </head>
-<body onload="initNotifications()">
+<body>
 
-<div class="header">
-    <a href="javascript:void(0);" class="nav-toggle" onclick="menu_toogle()">
-        <i class="fa fa-bars"></i>
-    </a>
+<header class="header">
+    <button class="nav-toggle" id="nav-toggle_id">
+        <i class="fas fa-bars"></i>
+    </button>
     <a href="/" class="logo">WebChat</a>
     <div class="sub_headers" id="myheader">
-        <div class="header-left">
+        <nav class="header-left">
             <a href="/chat/groupchats">chats</a>
             <a href="/chat/createchat">createchat</a>
-        </div>
-        <div class="header-right" >
+        </nav>
+        <nav class="header-right">
             <% if request.auth_is: %>
                 <% user = request.auth_get_user(none='') %>
                 <a class="/*active*/" href="/auth/manage/">
@@ -37,17 +38,14 @@
                 <a href="/auth/register">Register</a>
                 <a href="/auth/login">Login</a>
             <% end %>
-        </div>
+        </nav>
     </div>
+</header>
 
-</div>
-
-<div style="padding-left:0; height: 100%;">
-
+<main>
     <%= body %>
 
-</div>
-
+</main>
 
 <script src="<%= link_for('js/MyJS.js') %>"></script>
 </body>

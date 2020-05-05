@@ -1,7 +1,7 @@
 <% base = 'shared/base.html' %>
 
 <div class="container2">
-    <form action="/chat/createchat" method="post" id="createchat_form" onload="create_chat_form();">
+    <form action="/chat/createchat" method="post" id="createchat_form">
         <div class="form-style-5">
             <fieldset>
                 <legend><span class="number">1</span> Create Chat</legend>
@@ -16,18 +16,8 @@
                        style="display: none;">
             </fieldset>
             <input type="submit" value="Apply"/>
+            <p><strong><%= message %></strong></p>
         </div>
-        <%= message %>
+
     </form>
 </div>
-
-
-<script type="text/javascript">
-    let tag_form = document.getElementById("createchat_form");
-    let tag_select = document.getElementById("createchat_select");
-    let tag_password = document.getElementById("createchat_password");
-
-    tag_select.onchange = () => {
-        tag_password.style = tag_select.value === "PUBLIC" ? "display: none;" : '';
-    };
-</script>

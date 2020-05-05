@@ -74,7 +74,9 @@ function initNotifications() {
         // alert("Your browser doesn't support Notifications API");
     }
 }
+
 var notification_test_counter = 0
+
 function showNotification(title, message, tag = 'tag') {
     if (notificationsEnabled) {
         notification_test_counter++;
@@ -82,7 +84,7 @@ function showNotification(title, message, tag = 'tag') {
             body: message,
             // icon: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             vibrate: [200, 100, 200],
-            tag: tag+notification_test_counter,
+            tag: tag + notification_test_counter,
             // image: "/static/other/jason-leung-HM6TMmevbZQ-unsplash.jpg",
             badge: "/static/sun.ico",
             // actions: [{action: "Detail", title: "View", icon: "https://via.placeholder.com/128/ff0000"}]
@@ -105,27 +107,61 @@ window.onblur = function () {
 };
 
 
-
-
 function toggleNav() {
-    var el = document.getElementById("people-list");
-    el.style.width = el.style.width === '0px' ? '235px' : '0px';
+    var el = document.querySelector(".chat-left-infobar");
+    el.style.width = el.style.width === '0px' ? '165px' : '0px';
 }
 
 function mediawidth(x) {
-    var el = document.getElementById("people-list");
+    var el = document.querySelector(".chat-left-infobar");
     var el_button = document.getElementById('chat-nav-button');
     if (x.matches) {
         el.style.width = '0px';
         // el_button.style.display = '';
     } else {
-        el.style.width = '235px';
+        el.style.width = '165px';
         // el_button.style.display = 'none';
     }
 }
 
+function init_mediawidth() {
+    var el = document.getElementById("chat-box");
+    console.log(el);
+    if (el !== null) {
+        var x = window.matchMedia("(max-width: 750px)")
+        mediawidth(x);
+        x.addListener(mediawidth); // Attach listener function on state changes
+        return true;
+    }
+    return false;
+}
+
+function init_create_chat_form() {
+    var tag_form = document.getElementById("createchat_form");
+    console.log(tag_form);
+    if (tag_form !== null) {
+        var tag_select = document.getElementById("createchat_select");
+        var tag_password = document.getElementById("createchat_password");
+
+        tag_select.onchange = () => {
+            tag_password.style = tag_select.value === "PUBLIC" ? "display: none;" : '';
+        };
+        return true;
+    }
+    return false;
+}
+
+function init_menu_toggle() {
+    var button = document.getElementById("nav-toggle_id");
+    if (button !== null) {
+        button.addEventListener('click', menu_toogle);
+    }
+}
+
 window.onload = () => {
-    var x = window.matchMedia("(max-width: 750px)")
-    mediawidth(x);
-    x.addListener(mediawidth); // Attach listener function on state changes
+    initNotifications();
+    init_menu_toggle()
+
+    if (init_create_chat_form()) {}
+    else if (init_mediawidth()) {}
 }

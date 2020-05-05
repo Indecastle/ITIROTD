@@ -1,12 +1,14 @@
 <% base = 'shared/base.html' %>
 <% kek = request.query.get('count2', '') %>
+
 <div class="container2">
     <div class="list-chats-search">
         <form id="search_form_listchats">
             <input type="text" name="text_message" placeholder="search">
             <input type="submit" name="button" hidden="">
             <i class="fa fa-search"></i>
-            <label for="checkbox_other">other</label><input id="checkbox_other" name="checkbox_other" type="checkbox">
+            <label for="checkbox_other">other</label><input id="checkbox_other" name="checkbox_other"
+                                                            type="checkbox">
 
         </form>
     </div>
@@ -20,60 +22,7 @@
         </tr>
         </thead>
         <tbody id="table_body">
-
         </tbody>
     </table>
 </div>
-
-<script>
-    var search_form_listchats = document.querySelector('#search_form_listchats')
-    var checkbox_other = search_form_listchats.checkbox_other;
-    var table_body = document.querySelector('#table_body')
-    checkbox_other.addEventListener('change', (event) => search_form_listchats.onsubmit(event));
-
-    function tourl(td) {
-        window.location.href = "/chat/chat?chat_id=" + td.parentElement.children[0].innerHTML;
-    }
-
-    search_form_listchats.onsubmit = function (event) {
-        event.preventDefault();
-        let text = search_form_listchats.text_message.value;
-        let url = `/json/get_chats?search=${text}&isnotmy=${checkbox_other.checked}&count=${100}`
-        getJSON(url, (out) => {
-            console.log(out);
-            // var tbody = document.createElement("tbody");
-            table_body.innerHTML = '';
-            for (let obj of out.chats) {
-                let tr = document.createElement("tr");
-                let td1 = document.createElement("td");
-                let td2 = document.createElement("td");
-                let td3 = document.createElement("td");
-
-                td1.innerText = obj.id;
-                td2.innerText = obj.name;
-                td2.onclick = () => { tourl(td2) };
-                td3.innerText = obj.type;
-                if (obj.type === 'PUBLIC')
-                    td3.className = 'td-public';
-                else
-                    td3.className = 'td-private';
-
-                tr.appendChild(td1);
-                tr.appendChild(td2);
-                tr.appendChild(td3);
-                table_body.appendChild(tr);
-            }
-            // table_body.outerHTML = tbody;
-        })
-        return false;
-    };
-
-    search_form_listchats.querySelector('i').onclick = () => {
-        search_form_listchats.button.click();
-    };
-
-    window.onload = (event) => {
-        search_form_listchats.onsubmit(event);
-    }
-</script>
 

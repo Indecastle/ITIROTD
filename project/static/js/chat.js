@@ -1,9 +1,11 @@
+function img_error(event) {
+    event.target.onerror = null;
+    event.target.src = '/static/agent.png'
 
+}
 
 function timeConverter(UNIX_timestamp) {
     var a = new Date(UNIX_timestamp * 1000);
-    console.log(a);
-    console.log(UNIX_timestamp);
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var year = a.getFullYear();
     var month = months[a.getMonth()];
@@ -17,11 +19,12 @@ function timeConverter(UNIX_timestamp) {
 
 var user_list = document.querySelector('#user_list'),
     chat_list = document.querySelector('#chat_list'),
-    parent_chat_list = chat_list.parentElement.parentElement,
-    my_form = document.querySelector('#my_form'),
+    parent_chat_list = chat_list, //document.querySelector('#chat_list'),
+    my_form = document.forms.my_form, //document.querySelector('#my_form'),
     chat_form_users = document.querySelector('#chat_form_users'),
     text_message = document.querySelector('#text_message'),
-    p_is_reading = document.querySelector('#form_p'),
+    chat_nav_button = document.querySelector('#chat-nav-button'),
+    span_is_reading = document.querySelector('#form_isreading'),
     already_messages = document.querySelector('#already_messages'),
     chat_header = document.querySelector('#chat_header'),
     websocket = new WebSocket("wss://localhost:6789/"),
@@ -57,73 +60,60 @@ my_form.onsubmit = function (event) {
 };
 
 function render_message(message, user, is_new_message, uuid = 'invalid') {
-    let li = document.querySelector('#new_message_' + uuid);
-    if (li !== null) {
-        let i = li.children[0].children[0];
+    let div1 = document.querySelector('#new_message_' + uuid);
+    if (div1 !== null) {
         let finded_message = all_messages.find(mes => mes.id === uuid);
+        let status = finded_message.dom_element_status;
         Object.assign(finded_message, message);
-        li.id = 'message_' + message.id;
+        div1.id = 'message_' + message.id;
         // div.style = '';
-        i.classList.remove("chat_message_nosend");
+        status.classList.remove("chat_message_nosend");
         if (user.id === my_user.id)
-            i.classList.add('chat_message_noreaded')
+            status.classList.add('chat_message_noreaded')
     } else {
         var is_bottom = parent_chat_list.scrollHeight - parent_chat_list.scrollTop === parent_chat_list.clientHeight;
 
-        var n_li = document.createElement("li");
         var n_div1 = document.createElement("div");
-        var n_span1 = document.createElement("span");
-        var n_span2 = document.createElement("span");
-        var n_i = document.createElement("i");
+        var n_img = document.createElement("img");
         var n_div2 = document.createElement("div");
+        var n_strong = document.createElement("strong");
+        var n_span = document.createElement("span");
+        var n_div3 = document.createElement("div");
 
-        n_span1.classList.add("chat-message-data-time");
-        n_span2.classList.add("chat-message-data-name");
-        n_i.className = "fa fa-circle";
-        n_div1.className = "chat-message-data";
+        n_div1.classList.add("chat-message-box");
+        // n_img.setAttribute("onerror", "this.onerror=null;this.src='/static/agent.png'");
+        n_img.onerror = img_error;
+        n_div2.classList.add("chat-message-main-box");
+        n_div3.className = "chat-message-text";
 
-        if (user.id === my_user.id) {
-            n_li.classList.add("chat-clearfix");
-            n_i.classList.add("chat-online");
-            n_div2.className = "chat-message chat-my-message";
-            n_div1.appendChild(n_i);
-            n_div1.appendChild(n_span2);
-            n_div1.appendChild(n_span1);
+        n_img.src = '/' + user.photopath;
+        n_strong.innerText = user.nickname;
+        n_span.innerText = timeConverter(message.when);
+        n_div3.innerText = message.text;
 
-        } else {
-            n_li.classList.add("chat-clearfix");
-            n_div1.classList.add("chat-align-right");
-            n_i.classList.add("chat-me");
-            n_div2.className = "chat-message chat-other-message chat-float-right";
-            n_div1.appendChild(n_span1);
-            n_div1.appendChild(n_span2);
-            n_div1.appendChild(n_i);
-        }
+        n_div2.appendChild(n_strong);
+        n_div2.appendChild(n_span);
+        n_div2.appendChild(n_div3);
+        n_div1.appendChild(n_img);
+        n_div1.appendChild(n_div2);
 
-        n_div2.innerHTML = message.text;
-        n_span1.innerHTML = timeConverter(message.when);
-        n_span2.innerHTML = user.nickname;
+        chat_list.appendChild(n_div1);
 
-
-        n_li.appendChild(n_div1);
-        n_li.appendChild(n_div2);
-        chat_list.appendChild(n_li);
-
-        message['dom_element'] = n_li;
-        message['dom_element_status'] = n_i;
+        message['dom_element'] = n_div1;
+        message['dom_element_status'] = n_div3;
         all_messages.push(message);
 
         if (is_new_message === true) {
             message.id = uuid;
-            n_li.id = 'new_message_' + uuid;
-            n_i.classList.add("chat_message_nosend");
+            n_div1.id = 'new_message_' + uuid;
+            n_div3.classList.add("chat_message_nosend");
             // div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
         } else {
-            n_li.id = 'message_' + message.id;
+            n_div1.id = 'message_' + message.id;
         }
 
         if (message.isreaded === false)
-            n_i.classList.add('chat_message_noreaded')
+            n_div1.classList.add('chat_message_noreaded')
 
         if (is_bottom)
             parent_chat_list.scrollTop = parent_chat_list.scrollHeight;
@@ -145,68 +135,55 @@ function render_all_users() {
     for (let user of all_users) {
         let li = document.createElement("li");
         let img = document.createElement("img");
-        let div = document.createElement("div");
-        let div2 = document.createElement("div");
-        let div3 = document.createElement("div");
         let i = document.createElement("i");
         let span = document.createElement("span");
 
-        li.classList.add("chat-clearfix");
         img.src = '/' + user.photopath;
-        img.setAttribute("onerror", "this.onerror=null;this.src='/static/agent.png'");
+        img.onerror = img_error;
         img.setAttribute('height', '55px');
         img.setAttribute('width', '55px');
         img.alt = 'avatar';
-        div.classList.add("chat-about");
-        div2.classList.add("chat-name");
-        div3.classList.add("chat-status");
         i.className = "fa fa-circle chat-online";
+        span.textContent = user.nickname;
 
-        div3.appendChild(i);
-        div3.appendChild(span);
-        div.appendChild(div2);
-        div.appendChild(div3);
         li.appendChild(img);
-        li.appendChild(div);
+        li.appendChild(i);
+        li.appendChild(span);
         user_list.appendChild(li);
-        div2.innerHTML = user.nickname;
+
         user['dom_element'] = li;
-        user['dom_element_status'] = span;
+        user['dom_element_status'] = i;
     }
 }
 
 function render_users() {
     for (let user of all_users) {
         let user2 = online_users.find(u => u.id === user.id);
-        let i = user.dom_element.querySelector('i');
+        let i = user.dom_element_status;
         // user.dom_element.classList.remove(...element.classList);
         if (user2 === undefined) {
             i.classList.remove('chat-online');
             i.classList.add('chat-offline');
-            user.dom_element_status.innerHTML = "offline";
-        }
-        else {
+        } else {
             i.classList.remove('chat-offline');
             i.classList.add('chat-online');
-            user.dom_element_status.innerHTML = "online";
         }
-
     }
 }
 
 function action_is_reading(user, users_is_reading) {
     users_name = users_is_reading.filter(user => user.id !== my_user.id).map(user => user.nickname);
     if (users_name.length > 0) {
-        p_is_reading.innerHTML = 'reading...' + JSON.stringify(users_name);
+        span_is_reading.innerHTML = 'reading...' + JSON.stringify(users_name);
     } else {
-        p_is_reading.innerHTML = '';
+        span_is_reading.innerHTML = '';
     }
 }
 
 function init_myuser() {
-    const img = chat_header.querySelector('img');
+    const img = chat_header.children[0];
     img.src = '/' + my_user.photopath;
-    img.setAttribute("onerror", "this.onerror=null;this.src='/static/agent.png'");
+    img.onerror = img_error;
     chat_header.children[1].children[0].innerHTML = my_user.nickname;
 }
 
@@ -275,31 +252,8 @@ setInterval(function () {
     }
 }, 2000);
 
-
-function toggleNav() {
-    var el = document.getElementById("people-list");
-    el.style.width = el.style.width === '0px' ? '235px' : '0px';
-}
-
-function mediawidth(x) {
-    var el = document.getElementById("people-list");
-    var el_button = document.getElementById('chat-nav-button');
-    if (x.matches) {
-        el.style.width = '0px';
-        // el_button.style.display = '';
-    } else {
-        el.style.width = '235px';
-        // el_button.style.display = 'none';
-    }
-}
-
-window.onload = () => {
-    var x = window.matchMedia("(max-width: 750px)")
-    mediawidth(x);
-    x.addListener(mediawidth); // Attach listener function on state changes
-}
-
 var shiftDown = false;
+
 function initChatEvent() {
     var messageBox = my_form.form_message;
     var button = document.getElementById("form_button")
@@ -320,6 +274,7 @@ function initChatEvent() {
         if (e.keyCode === 16) shiftDown = false;
     };
 }
+
 initChatEvent();
 
 chat_form_users.onsubmit = function (event) {

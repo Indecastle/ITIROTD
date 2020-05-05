@@ -1,14 +1,12 @@
 <% base = 'shared/base.html' %>
 
 <div class="login-page">
-    <div class="form">
-        <form class="login-form" action="/auth/login" method="post">
-            <input type="text" required name="login" placeholder="login"/>
-            <input type="password" required name="password" placeholder="password"/>
-            <button>login</button>
-            <p class="message">Not registered? <a href="/auth/register">Create an account</a></p>
-        </form>
-        <h2><%= message %></h2>
-    </div>
+    <form class="login-form" action="/auth/login" method="post">
+        <input type="text" required name="login" placeholder="login"/>
+        <input type="password" required name="password" placeholder="password"/>
+        <input type="submit" value="login">
+        <p class="message">Not registered? <a href="/auth/register">Create an account</a></p>
+        <p><strong><%= message %></strong></p>
+    </form>
 </div>
 

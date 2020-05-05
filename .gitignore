@@ -1,3 +1,3 @@
-__pycache__/
+project/__pycache__/
 .idea/
-static/other/
+project/static/other/
