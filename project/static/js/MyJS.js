@@ -124,6 +124,10 @@ function mediawidth(x) {
     }
 }
 
+function calc_width_message(width) {
+    return window.innerWidth > 750 ? (width - 165) * 0.6 : width * 0.6
+}
+
 function init_chat() {
     var el = document.getElementById("chat-box");
     if (el !== null) {
@@ -133,6 +137,16 @@ function init_chat() {
 
         var user_search_button = document.getElementById("chat-nav-button")
         user_search_button.onclick = toggleNav;
+
+        function resize_messages() {
+            var w = el.clientWidth;
+            var elements = el.getElementsByClassName("chat-message-text");
+            for (let el of elements) {
+                el.style.maxWidth = calc_width_message(w) + 'px';
+            }
+        }
+        resize_messages();
+        window.addEventListener("resize", resize_messages);
 
         return true;
     }
@@ -218,8 +232,7 @@ function init_menu_toggle() {
     }
 }
 
-
-window.onload = () => {
+window.addEventListener("load", () => {
     initNotifications();
     init_menu_toggle()
 
@@ -227,4 +240,4 @@ window.onload = () => {
     else if (init_chat()) {}
     else if (init_listchats()) {}
     else if (init_chat()) {}
-}
+});

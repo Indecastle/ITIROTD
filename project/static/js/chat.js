@@ -17,7 +17,8 @@ function timeConverter(UNIX_timestamp) {
     return time;
 }
 
-var user_list = document.querySelector('#user_list'),
+var chat_box = document.getElementById("chat-box"),
+    user_list = document.querySelector('#user_list'),
     chat_list = document.querySelector('#chat_list'),
     parent_chat_list = chat_list, //document.querySelector('#chat_list'),
     my_form = document.forms.my_form, //document.querySelector('#my_form'),
@@ -27,7 +28,7 @@ var user_list = document.querySelector('#user_list'),
     span_is_reading = document.querySelector('#form_isreading'),
     already_messages = document.querySelector('#already_messages'),
     chat_header = document.querySelector('#chat_header'),
-    websocket = new WebSocket("wss://localhost:6789/"),
+    websocket = new WebSocket("ws://localhost:6789/"),
     all_messages = [],
     online_users = [],
     all_users = [],
@@ -63,50 +64,56 @@ function render_message(message, user, is_new_message, uuid = 'invalid') {
     let div1 = document.querySelector('#new_message_' + uuid);
     if (div1 !== null) {
         let finded_message = all_messages.find(mes => mes.id === uuid);
-        let status = finded_message.dom_element_status;
+        let mess_dom = finded_message.dom_element;
         Object.assign(finded_message, message);
         div1.id = 'message_' + message.id;
         // div.style = '';
-        status.classList.remove("chat_message_nosend");
+        mess_dom.classList.remove("chat_message_nosend");
         if (user.id === my_user.id)
-            status.classList.add('chat_message_noreaded')
+            mess_dom.classList.add('chat_message_noreaded')
     } else {
         var is_bottom = parent_chat_list.scrollHeight - parent_chat_list.scrollTop === parent_chat_list.clientHeight;
 
         var n_div1 = document.createElement("div");
         var n_img = document.createElement("img");
         var n_div2 = document.createElement("div");
-        var n_strong = document.createElement("strong");
-        var n_span = document.createElement("span");
         var n_div3 = document.createElement("div");
+        var n_strong = document.createElement("strong");
+        var n_time = document.createElement("time");
+        var n_div4 = document.createElement("div");
 
         n_div1.classList.add("chat-message-box");
+        if(user.id === my_user.id)
+            n_div1.classList.add("chat-message-me");
         // n_img.setAttribute("onerror", "this.onerror=null;this.src='/static/agent.png'");
         n_img.onerror = img_error;
         n_div2.classList.add("chat-message-main-box");
-        n_div3.className = "chat-message-text";
+        n_div3.classList.add("chat-message-info-box");
+        n_div4.className = "chat-message-text";
+        n_div4.style.maxWidth = calc_width_message(chat_box.clientWidth) + 'px';
 
         n_img.src = '/' + user.photopath;
         n_strong.innerText = user.nickname;
-        n_span.innerText = timeConverter(message.when);
-        n_div3.innerText = message.text;
+        n_time.innerText = timeConverter(message.when);
+        n_div4.innerText = message.text;
 
-        n_div2.appendChild(n_strong);
-        n_div2.appendChild(n_span);
+        n_div3.appendChild(n_strong);
+        n_div3.appendChild(n_time);
         n_div2.appendChild(n_div3);
+        n_div2.appendChild(n_div4);
         n_div1.appendChild(n_img);
         n_div1.appendChild(n_div2);
 
         chat_list.appendChild(n_div1);
 
         message['dom_element'] = n_div1;
-        message['dom_element_status'] = n_div3;
+        message['dom_element_status'] = n_div4;
         all_messages.push(message);
 
         if (is_new_message === true) {
             message.id = uuid;
             n_div1.id = 'new_message_' + uuid;
-            n_div3.classList.add("chat_message_nosend");
+            n_div1.classList.add("chat_message_nosend");
             // div2.style = 'background-color: rgba(100, 100, 100, 0.2);';
         } else {
             n_div1.id = 'message_' + message.id;
@@ -126,7 +133,7 @@ function action_onfocus(user_id) {
     var filter_messages = all_messages; //.filter(mes => mes.user_id === my_user.id);
     var user = online_users.find(user => user.id === user_id);
     if (my_user.id !== user_id) {
-        filter_messages.forEach(mes => mes.dom_element_status.classList.remove('chat_message_noreaded'));
+        filter_messages.forEach(mes => mes.dom_element.classList.remove('chat_message_noreaded'));
     }
 }
 
@@ -293,3 +300,4 @@ chat_form_users.onsubmit = function (event) {
 chat_form_users.querySelector('i').onclick = () => {
     chat_form_users.button.click();
 };
+

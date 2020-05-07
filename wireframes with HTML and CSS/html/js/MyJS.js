@@ -6,7 +6,7 @@ function find_cookie(key) {
     return undefined;
 }
 
-var getJSON = function (url, callback) {
+function getJSON(url, callback) {
     fetch(url, {credentials: 'include'})
         .then(res => res.json())
         .then(callback)
@@ -124,13 +124,30 @@ function mediawidth(x) {
     }
 }
 
-function init_mediawidth() {
+function calc_width_message(width) {
+    return window.innerWidth > 750 ? (width - 165) * 0.6 : width * 0.6
+}
+
+function init_chat() {
     var el = document.getElementById("chat-box");
-    console.log(el);
     if (el !== null) {
         var x = window.matchMedia("(max-width: 750px)")
         mediawidth(x);
         x.addListener(mediawidth); // Attach listener function on state changes
+
+        var user_search_button = document.getElementById("chat-nav-button")
+        user_search_button.onclick = toggleNav;
+
+        function resize_messages() {
+            var w = el.clientWidth;
+            var elements = el.getElementsByClassName("chat-message-text");
+            for (let el of elements) {
+                el.style.maxWidth = calc_width_message(w) + 'px';
+            }
+        }
+        resize_messages();
+        window.addEventListener("resize", resize_messages);
+
         return true;
     }
     return false;
@@ -138,7 +155,6 @@ function init_mediawidth() {
 
 function init_create_chat_form() {
     var tag_form = document.getElementById("createchat_form");
-    console.log(tag_form);
     if (tag_form !== null) {
         var tag_select = document.getElementById("createchat_select");
         var tag_password = document.getElementById("createchat_password");
@@ -151,6 +167,64 @@ function init_create_chat_form() {
     return false;
 }
 
+
+function init_listchats() {
+    var search_form_listchats = document.querySelector('#search_form_listchats')
+    if (search_form_listchats === null)
+        return false;
+    var checkbox_other = search_form_listchats.checkbox_other;
+    var table_body = document.querySelector('#table_body')
+    checkbox_other.addEventListener('change', (event) => search_form_listchats.onsubmit(event));
+
+    function tourl(td) {
+        window.location.href = "/chat/chat?chat_id=" + td.parentElement.children[0].innerHTML;
+    }
+
+    search_form_listchats.onsubmit = function (event) {
+        event.preventDefault();
+        let text = search_form_listchats.text_message.value;
+        let url = `/json/get_chats?search=${text}&isnotmy=${checkbox_other.checked}&count=${100}`
+        getJSON(url, (out) => {
+            console.log(out);
+            // var tbody = document.createElement("tbody");
+            table_body.innerHTML = '';
+            for (let obj of out.chats) {
+                let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                let td2 = document.createElement("td");
+                let td3 = document.createElement("td");
+
+                td1.innerText = obj.id;
+                td2.innerText = obj.name;
+                td2.onclick = () => {
+                    tourl(td2)
+                };
+                td3.innerText = obj.type;
+                if (obj.type === 'PUBLIC')
+                    td3.className = 'td-public';
+                else
+                    td3.className = 'td-private';
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+                table_body.appendChild(tr);
+            }
+        })
+        return false;
+    };
+
+    search_form_listchats.querySelector('i').onclick = () => {
+        search_form_listchats.button.click();
+    };
+
+    // search_form_listchats.onsubmit(new CustomEvent('submit', {canselable: true} ));
+    search_form_listchats.dispatchEvent(new CustomEvent('submit', {canselable: true} ));
+
+    return true;
+}
+
+
 function init_menu_toggle() {
     var button = document.getElementById("nav-toggle_id");
     if (button !== null) {
@@ -158,10 +232,12 @@ function init_menu_toggle() {
     }
 }
 
-window.onload = () => {
+window.addEventListener("load", () => {
     initNotifications();
     init_menu_toggle()
 
     if (init_create_chat_form()) {}
-    else if (init_mediawidth()) {}
-}
+    else if (init_chat()) {}
+    else if (init_listchats()) {}
+    else if (init_chat()) {}
+});

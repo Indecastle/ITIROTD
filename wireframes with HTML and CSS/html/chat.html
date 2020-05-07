@@ -41,7 +41,7 @@
                 </form>
             </div>
             <div class="list-users">
-                <ul>
+                <ul id="user_list">
                     <li>
                         <img src="./boat.jpg" alt="avatar">
                         <i class="fas fa-circle chat-online"></i>
@@ -96,49 +96,66 @@
             </div>
         </div>
         <div class="chat-main-box">
-            <div class="chat-header-box">
+            <div class="chat-header-box" id="chat_header">
                 <img src="./boat.jpg" alt="avatar">
 
                 <div class="chat-about-myuser">
                     <div class="chat-about-nickname">Andrey</div>
                     <div class="chat-about-count-messages" id="already_messages">already 2 messages</div>
                 </div>
-                <i class="fas fa-bars" id="chat-nav-button" onclick="toggleNav()"></i>
+                <button id="chat-nav-button">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            <div class="chat-history-box">
+            <div class="chat-history-box" id="chat_list">
                 <div class="chat-message-box">
                     <img src="./boat.jpg" alt="avatar">
                     <div class="chat-message-main-box">
-                        <strong>Andrey</strong><span>30 Apr 2020 11:11:11</span>
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:11</time>
+                        </div>
+
+                        <div class="chat-message-text">Across the world, countries are embarking on enormous experiments in ending coronavirus lockdown measures - and others are looking on nervously, asking themselves what's the best way back to normality.
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-message-box chat-message-me chat_message_noreaded">
+                    <img src="./boat.jpg" alt="avatar">
+                    <div class="chat-message-main-box">
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:12</time>
+                        </div>
                         <div class="chat-message-text">Some
 message
-Some
-  message
+ Some
+message
     Some
-message</div>
+message
+                        </div>
                     </div>
                 </div>
-                <div class="chat-message-box">
+                <div class="chat-message-box chat-message-me chat_message_nosend">
                     <img src="./boat.jpg" alt="avatar">
                     <div class="chat-message-main-box">
-                        <strong>Andrey</strong><span>30 Apr 2020 11:11:12</span>
-                        <div class="chat-message-text chat_message_noreaded">Across the world, countries are embarking on enormous experiments in ending coronavirus lockdown measures - and others are looking on nervously, asking themselves what's the best way back to normality.</div>
-                    </div>
-                </div>
-                <div class="chat-message-box">
-                    <img src="./boat.jpg" alt="avatar">
-                    <div class="chat-message-main-box">
-                        <strong>Andrey</strong><span>30 Apr 2020 11:11:13</span>
-                        <div class="chat-message-text chat_message_nosend">Some Message</div>
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:13</time>
+                        </div>
+                        <div class="chat-message-text">Some Message</div>
                     </div>
                 </div>
             </div>
             <div class="chat-input-box">
-                <form id="my_form">
+                <form name="my_form" id="my_form">
                     <textarea name="form_message" id="text_message" placeholder="Type your message" rows="3"></textarea>
+                    <button id="form_button_sticker">
                     <span class="chat-sticker">
                         <i class="far fa-smile"></i>
                     </span>
+                    </button>
+                    <span id="form_isreading"></span>
                     <button id="form_button"><i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>

@@ -213,7 +213,8 @@ def start_asyncio():
 
         ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ssl_context.load_cert_chain(SSL_PEM_PATH)
-        start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH, ssl=ssl_context)
+        # start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH, ssl=ssl_context)
+        start_server = websockets.serve(action_loop, *WEBSOCKET_CHAT_PATH)
 
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
