@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/boat.jpg"/>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+          integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/static/css/styles2.css">
+</head>
+<body>
+
+<header class="header">
+    <button class="nav-toggle" id="nav-toggle_id">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a href="/" class="logo">WebChat</a>
+    <div class="sub_headers" id="myheader">
+        <nav class="header-left">
+            <a href="/chat/groupchats">chats</a>
+            <a href="/chat/createchat">createchat</a>
+        </nav>
+        <nav class="header-right">
+            <a href="/auth/register">Register</a>
+            <a href="/auth/login">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="login-page">
+            <form class="login-form" action="/auth/login" method="post">
+                <input type="text" required name="login" placeholder="login"/>
+                <input type="password" required name="password" placeholder="password"/>
+                <input type="submit" value="login"></input>
+                <p class="message">Not registered? <a href="/auth/register">Create an account</a></p>
+                <p><strong>{{ message_box }}</strong></p>
+            </form>
+        </div>
+</main>
+
+
+<script src="/static/js/frame-MyJS.js"></script>
+</body>
+</html>
+

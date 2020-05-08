@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/boat.jpg"/>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+          integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/static/css/styles2.css">
+</head>
+<body>
+
+<header class="header">
+    <button class="nav-toggle" id="nav-toggle_id">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a href="/" class="logo">WebChat</a>
+    <div class="sub_headers" id="myheader">
+        <nav class="header-left">
+            <a href="/chat/groupchats">chats</a>
+            <a href="/chat/createchat">createchat</a>
+        </nav>
+        <nav class="header-right">
+            <a href="/auth/register">Register</a>
+            <a href="/auth/login">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="chat-box" id="chat-box">
+        <div class="chat-left-infobar">
+            <div class="input-search-box">
+                <form id="chat_form_users">
+                    <input type="text" name="text_message" placeholder="search"/>
+                    <input type="submit" name="button" hidden>
+                    <i class="fa fa-search"></i>
+                </form>
+            </div>
+            <div class="list-users">
+                <ul id="user_list">
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-offline"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-offline"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-offline"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-offline"></i>
+                        <span>Andrey</span>
+                    </li>
+                    <li>
+                        <img src="/static/boat.jpg" alt="avatar">
+                        <i class="fas fa-circle chat-online"></i>
+                        <span>Andrey</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="chat-main-box">
+            <div class="chat-header-box" id="chat_header">
+                <img src="/static/boat.jpg" alt="avatar">
+
+                <div class="chat-about-myuser">
+                    <div class="chat-about-nickname">Andrey</div>
+                    <div class="chat-about-count-messages" id="already_messages">already 2 messages</div>
+                </div>
+                <button id="chat-nav-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="chat-history-box" id="chat_list">
+                <div class="chat-message-box">
+                    <img src="/static/boat.jpg" alt="avatar">
+                    <div class="chat-message-main-box">
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:11</time>
+                        </div>
+
+                        <div class="chat-message-text">Across the world, countries are embarking on enormous experiments in ending coronavirus lockdown measures - and others are looking on nervously, asking themselves what's the best way back to normality.
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-message-box chat-message-me chat_message_noreaded">
+                    <img src="/static/boat.jpg" alt="avatar">
+                    <div class="chat-message-main-box">
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:12</time>
+                        </div>
+                        <div class="chat-message-text">Some
+message
+ Some
+message
+    Some
+message</div>
+                    </div>
+                </div>
+                <div class="chat-message-box chat-message-me chat_message_nosend">
+                    <img src="/static/boat.jpg" alt="avatar">
+                    <div class="chat-message-main-box">
+                        <div class="chat-message-info-box">
+                            <strong>Andrey</strong>
+                            <time>30 Apr 2020 11:11:13</time>
+                        </div>
+                        <div class="chat-message-text">Some Message</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-box">
+                <form name="my_form" id="my_form">
+                    <textarea name="form_message" id="text_message" placeholder="Type your message" rows="3"></textarea>
+                    <button id="form_button_sticker">
+                    <span class="chat-sticker">
+                        <i class="far fa-smile"></i>
+                    </span>
+                    </button>
+                    <span id="form_isreading"></span>
+                    <button id="form_button"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="/static/js/frame-MyJS.js"></script>
+</body>
+</html>
+
+

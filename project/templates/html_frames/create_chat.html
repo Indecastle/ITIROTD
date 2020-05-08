@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/boat.jpg"/>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+          integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/static/css/styles2.css">
+</head>
+<body>
+
+<header class="header">
+    <button class="nav-toggle" id="nav-toggle_id">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a href="/" class="logo">WebChat</a>
+    <div class="sub_headers" id="myheader">
+        <nav class="header-left">
+            <a href="/chat/groupchats">chats</a>
+            <a href="/chat/createchat">createchat</a>
+        </nav>
+        <nav class="header-right">
+            <a href="/auth/register">Register</a>
+            <a href="/auth/login">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container2">
+        <form action="/nothing" method="post" id="createchat_form">
+            <div class="form-style-5">
+                <fieldset>
+                    <legend><span class="number">1</span> Create Chat</legend>
+                    <input type="text" required name="name" placeholder="Name">
+                    <select id="createchat_select" name="type">
+                        <optgroup label="Type Safe">
+                            <option value="PUBLIC" selected>Public</option>
+                            <option value="SECURE">Secure</option>
+                        </optgroup>
+                    </select>
+                    <input id="createchat_password" type="text" name="password" placeholder="Password"
+                           style="display: none;">
+                </fieldset>
+                <input type="submit" value="Apply"/>
+                <p><strong>{{ message_box }}</strong></p>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+
+<script src="/static/js/frame-MyJS.js"></script>
+</body>
+</html>
+

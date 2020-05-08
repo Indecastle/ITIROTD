@@ -210,9 +210,9 @@ def run():
     chat_service = threading.Thread(target=start_http_server)
     chat_service.start()
 
-    server2 = ThreadingSimpleServer(config.SOCKET_HTTPS, CustomServer)
-    server2.socket = ssl.wrap_socket(server2.socket, certfile=config.SSL_PEM_PATH, server_side=True)
-    server2.serve_forever()
+    # server2 = ThreadingSimpleServer(config.SOCKET_HTTPS, CustomServer)
+    # server2.socket = ssl.wrap_socket(server2.socket, certfile=config.SSL_PEM_PATH, server_side=True)
+    # server2.serve_forever()
 
 
 print("Run Server...")
