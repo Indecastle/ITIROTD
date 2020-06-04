@@ -1,3 +1,4 @@
+import json
 from render import render_template
 
 error_messages = {404: ("Page Not Found", "we are sorry, but the page you requested was not found"),
@@ -14,7 +15,7 @@ def gen_code(code):
     return ''.join(f"<span>{c}</span>" for c in str(code))
 
 
-def my_error(request, message=None):
+def my_error(request, message=None, is_ajax=False):
     code = request.response.code
     if message is None:
         message = request.responses.get(code, ("other", "Another ERROR"))
@@ -22,4 +23,12 @@ def my_error(request, message=None):
               'message': message,
               'code_span': gen_code(code),
               'base_vars': {'title': 'ERROR'}}
-    return render_template(request, 'shared/Error.html', **kwargs)
+
+    if is_ajax:
+        ajax_dict = {
+            'html': render_template(request, 'shared/Error.html', kwargs=kwargs),
+            'title': 'Error'
+        }
+        return json.dumps(ajax_dict)
+    else:
+        return render_template(request, 'shared/Error.html', kwargs=kwargs)

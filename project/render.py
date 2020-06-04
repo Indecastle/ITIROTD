@@ -8,7 +8,7 @@ args = {
 }
 
 
-def render_template(request, file, **kwargs):
+def render_template(request, file, kwargs={}):
     template = pih.PIH(file)
     code = template.pythonCode()
 
@@ -18,9 +18,15 @@ def render_template(request, file, **kwargs):
     exec(code, e)
     # print(e.keys())
     if 'base' in e:
-        return render_template(request, e["base"], body=e["py_code"].getvalue(), base_vars=e["base_vars"])
+        return render_template(request, e["base"], kwargs={'body': e["py_code"].getvalue(),
+                                                           'base_vars': e["base_vars"]})
     else:
         return e["py_code"].getvalue()
 
 
 args['render_template'] = render_template
+
+
+def render_base_main(request):
+    return render_template(request, 'shared/base.html', kwargs={'body': '',
+                                                                'base_vars': {}})

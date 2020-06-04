@@ -11,7 +11,7 @@ from error import my_error
 @route('/blog')
 def blog(request):
     kwargs = {'filepath': 'static/sun.ico'}
-    return render_template(request, 'templates/blog.html', **kwargs)
+    return render_template(request, 'templates/blog.html', kwargs=kwargs)
 
 
 @route('/test_frames/chat')

@@ -1,9 +1,6 @@
-<% base = 'shared/base.html' %>
-<% base_vars['title'] = 'Enjoy Chat' %>
-
 <div class="container2">
     <div class="form-style-5">
-        <form action="/chat/enjoy_chat" method="post">
+        <form action="/chat/enjoy_chat" id="enjoy_form" method="post">
             <fieldset>
                 <legend><span class="number">1</span> Enjoy</legend>
                 <input type="hidden" required name="chat_id" value="<%= chat.id %>">
@@ -13,16 +10,7 @@
 
             </fieldset>
             <input type="submit" value="Apply"/>
+            <p><strong id="message_box"><%= message %></strong></p>
         </form>
     </div>
 </div>
-
-<script type="text/javascript">
-    let tag_form = document.getElementById("createchat_form");
-    let tag_select = document.getElementById("createchat_select");
-    let tag_password = document.getElementById("createchat_password");
-
-    tag_select.onchange = () => {
-        tag_password.style = tag_select.value === "PUBLIC" ? "display: none;" : '';
-    };
-</script>

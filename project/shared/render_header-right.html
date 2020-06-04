@@ -1,0 +1,11 @@
+<% if request.auth_is: %>
+    <% user = request.auth_get_user(none='') %>
+    <a class="/*active*/" href="/auth/manage/" data-link="ajax">
+    Hello <%= user.nickname %>
+    </a>
+    <a href="/auth/logout">LogOut</a>
+<% end %>
+<% else: %>
+    <a href="/auth/register" data-link="ajax">Register</a>
+    <a href="/auth/login" data-link="ajax">Login</a>
+<% end %>

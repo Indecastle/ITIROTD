@@ -6,7 +6,7 @@ from error import *
 import db
 
 
-@route('/chat/chat', authorize=Authorize())
+@route('/chat/chat', authorize=Authorize(), ajax=True)
 def chat(request):
     query = request.query
     # chat_id, chat_password = request.query_get('chat_id'), request.query_get('chat_id')
@@ -25,4 +25,4 @@ def chat(request):
         return redirect_to(request, f'/chat/enjoy_chat?chat_id={chat_id}')
 
     kwargs = {}
-    return render_template(request, 'templates/chat/chat.html', **kwargs)
+    return render_template(request, 'templates/chat/chat.html', kwargs=kwargs)

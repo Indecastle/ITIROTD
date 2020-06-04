@@ -37,7 +37,9 @@ class SessionChat:
         self.actions = {
             'send_message': self.action_send_message,
             'window_onfocus': self.action_window_onfocus,
-            'reading_message': self.action_reading_message
+            'reading_message': self.action_reading_message,
+            'delete_messages': self.action_delete_messages,
+            'edit_message': self.action_edit_message
         }
 
     async def websocket_send(self, message, users_info=None, except_user_info=None):
@@ -59,9 +61,11 @@ class SessionChat:
         self.message_readed(user_info)
         await self.websocket_send(self.gen_init(user), user_info)
         await self.notify_all_users()
+        await self.notify_stickers(user_info)
         await self.notify_users()
         await self.notify_messages(user_info)
         await self.action_reading_message({'is_reading': False}, user_info)
+        await self.send_isreading(None)
         return user_info
 
     async def disconnect_chat(self, websocket, user_info):
@@ -82,6 +86,48 @@ class SessionChat:
     def gen_init(self, user):
         users_dict = [u.to_dict() for u in self.chat.users]
         return json.dumps({"type": "init", "user": user.to_dict()})
+
+    async def notify_stickers(self, user_info):
+        stickers = [{'id': 1,
+                     'path_64': "/static/stickers/1-50-64.png",
+                     'path_128': "/static/stickers/1-50-128.png"},
+                    {'id': 2,
+                     'path_64': "/static/stickers/1-63-64.png",
+                     'path_128': "/static/stickers/1-63-128.png"},
+                    {'id': 3,
+                     'path_64': "/static/stickers/1-66-64.png",
+                     'path_128': "/static/stickers/1-66-128.png"},
+                    {'id': 4,
+                     'path_64': "/static/stickers/1-71-64.png",
+                     'path_128': "/static/stickers/1-71-128.png"},
+                    {'id': 5,
+                     'path_64': "/static/stickers/1-75-64.png",
+                     'path_128': "/static/stickers/1-75-128.png"},
+                    {'id': 6,
+                     'path_64': "/static/stickers/1-86-64.png",
+                     'path_128': "/static/stickers/1-86-128.png"},
+                    {'id': 7,
+                     'path_64': "/static/stickers/1-89-64.png",
+                     'path_128': "/static/stickers/1-89-128.png"},
+
+                    {'id': 8,
+                     'path_64': "/static/stickers/1-37-64.png",
+                     'path_128': "/static/stickers/1-37-128.png"},
+                    {'id': 9,
+                     'path_64': "/static/stickers/1-126-64.png",
+                     'path_128': "/static/stickers/1-126-128.png"},
+                    {'id': 10,
+                     'path_64': "/static/stickers/1-9008-64.png",
+                     'path_128': "/static/stickers/1-9008-128.png"},
+                    {'id': 11,
+                     'path_64': "/static/stickers/1-9011-64.png",
+                     'path_128': "/static/stickers/1-9011-128.png"},
+                    {'id': 12,
+                     'path_64': "/static/stickers/1-9045-64.png",
+                     'path_128': "/static/stickers/1-9045-128.png"},
+                    ]
+        json_encoded = json.dumps({"type": "get_stickers", "stickers": stickers})
+        await self.websocket_send(json_encoded, user_info)
 
     async def notify_all_users(self):
         list_users = [u.to_dict() for u in self.chat.users]
@@ -107,14 +153,15 @@ class SessionChat:
             await self.websocket_send(json_encoded)
 
     async def action_send_message(self, data, user_info):
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.5)
         await self.action_window_onfocus(None, user_info)
         user = user_info.user
         text = data['text']
         uuid = data['uuid']
+        is_sticker = data.get("is_sticker", False)
         when = int(time.time())
-        message_id = db.create_message(self.chat.id, user.id, when, text)
-        new_message = Message(message_id, self.chat.id, user.id, when, text, isreaded=False)
+        message_id = db.create_message(self.chat.id, user.id, when, text, is_sticker)
+        new_message = Message(message_id, self.chat.id, user.id, when, text, is_sticker=is_sticker, isreaded=False)
         new_message.user = user
         async with self.lock_messages:
             self.chat.messages.append(new_message)
@@ -146,6 +193,27 @@ class SessionChat:
         if user_info.user.is_reading != is_reading:
             user_info.user.is_reading = is_reading
             await self.send_isreading(user_info)
+
+    async def action_delete_messages(self, data, user_info):
+        id_list = data["id_list"]
+        print(id_list)
+        for id in id_list:
+            mes_obj = find_first(lambda mes: mes.id == id, self.chat.messages)
+            self.chat.messages.remove(mes_obj)
+        db.delete_messages_from_chat(self.chat.id, id_list)
+        json_str = json.dumps(
+            {"type": "delete_messages", "id_array": id_list})
+        await self.websocket_send(json_str)
+
+    async def action_edit_message(self, data, user_info):
+        message_id, text = data["message_id"], data["text"]
+        mes_obj = find_first(lambda mes: mes.id == message_id, self.chat.messages)
+        if mes_obj is not None:
+            mes_obj.text = text
+        json_str = json.dumps(
+            {"type": "edit_message", "message_id": message_id, 'text': text})
+        db.edit_message_from_chat(self.chat.id, message_id, text)
+        await self.websocket_send(json_str)
 
 
 async def register(websocket):

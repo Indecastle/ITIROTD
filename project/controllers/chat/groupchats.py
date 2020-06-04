@@ -1,3 +1,4 @@
+import json
 from routes import route, Method, redirect_to
 from render import render_template
 from auth import *
@@ -6,7 +7,7 @@ import models
 from helper import try_to_int, convert_args_to_querystr
 
 
-@route('chat/groupchats/', authorize=Authorize())
+@route('chat/groupchats/', authorize=Authorize(), ajax=True)
 def chat_groupchats(request, **kwargs):
     query = request.query
     count_str = query.get('count', [0])[0]
@@ -18,29 +19,25 @@ def chat_groupchats(request, **kwargs):
     chats = db.get_chats_by_user(user.id, limit=count)
     kwargs.update(chats=chats)
 
-    return render_template(request, 'templates/chat/groupchats.html', **kwargs)
+    return render_template(request, 'templates/chat/groupchats.html', kwargs=kwargs)
 
 
-@route('chat/createchat/', authorize=Authorize())
+@route('chat/createchat/', authorize=Authorize(), ajax=True)
 def chat_createchat(request, **kwargs):
     query = request.query
-    users = db.get_users()
-    user = request.auth_get_user()
-    users = list(filter(lambda u: u.id != user.id, users))
-    kwargs.update(users=users)
-    return render_template(request, 'templates/chat/createchat.html', **kwargs)
+    return render_template(request, 'templates/chat/createchat.html', kwargs=kwargs)
 
 
 @route('chat/createchat/', method=Method.POST, authorize=Authorize())
 def chat_createchat_POST(request):
     query = request.POST_query
-    print('query_post: ', query)
     name, type_chat, password = query.get2('name'), query.get2('type'), query.get2('password')
-
+    ajax_json = {}
     if not name or \
             not type_chat or \
             type_chat == 'SECURE' and not password:
-        return chat_createchat(request, message='Bad request')
+        ajax_json.update(message='Bad request')
+        return json.dumps(ajax_json)
         # return render_template(request, 'templates/chat/createchat.html', message='Bad request')
     # return redirect_to(request)
 
@@ -53,5 +50,5 @@ def chat_createchat_POST(request):
     if password:
         newquery.update(password=password)
     newquery = db.convert_args_to_querystr('&', query=newquery, is_str=False)
-    print(newquery)
+    # ajax_json.update(redirect='/chat/chat?' + newquery)
     return redirect_to(request, f'/chat/chat?' + newquery)

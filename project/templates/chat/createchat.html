@@ -1,4 +1,3 @@
-<% base = 'shared/base.html' %>
 
 <div class="container2">
     <form action="/chat/createchat" method="post" id="createchat_form">
@@ -16,7 +15,7 @@
                        style="display: none;">
             </fieldset>
             <input type="submit" value="Apply"/>
-            <p><strong><%= message %></strong></p>
+            <p><strong id="message_box"><%= message %></strong></p>
         </div>
 
     </form>

@@ -15,6 +15,7 @@ from chat_websocket import start_asyncio
 import db
 import models
 import config
+from render import render_base_main
 
 import controllers
 
@@ -49,7 +50,7 @@ def generate_headers(request, method, url):
     else:
         if re.match(r'^/json', url):
             content_type = 'application/json'
-        if method == 'GET' and url not in URLS:
+        if method == 'GET' and url not in URLS_GET and url not in URLS_GET_ajax:
             code = 404
         elif method == 'POST' and url not in URLS_POST:
             code = 404
@@ -61,9 +62,9 @@ def generate_headers(request, method, url):
     return code
 
 
-def generate_content(request, method, code, url):
+def generate_content(request, method, code, url, is_ajax):
     if str(code)[0] == '4':
-        return my_error(request).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
+        return my_error(request, is_ajax=True).encode('utf-8')  # b'<h1>404</h1><p>Not found</p>'
     if code == 302:
         return redirect_to(request)
     if re.match(r'^/static', url):
@@ -71,7 +72,12 @@ def generate_content(request, method, code, url):
     else:
         log_request(request)
         if method == 'GET':
-            return URLS[url](request).encode('utf-8')
+            # if is_ajax:
+            #     func = URLS_GET_ajax.get(url)
+            #     if func is None:
+            #         return b''
+            #     return URLS_GET_ajax[url](request).encode('utf-8')
+            return URLS_GET[url](request).encode('utf-8')
         if method == 'POST':
             return URLS_POST[url](request).encode('utf-8')
 
@@ -88,8 +94,12 @@ def send_headers(request):
 def generate_response(request):
     method, url = request.command, request.path
 
+
     code = generate_headers(request, method, url)
-    body = generate_content(request, method, code, url)
+    if url in URLS_GET_redirect or method == 'POST' or re.match(r'^/json', url) or re.match(r'^/static', url) or 'ajax' in request.headers:
+        body = generate_content(request, method, code, url, 'ajax' in request.headers)
+    else:
+        body = render_base_main(request).encode('utf-8')
 
     request.response.send_header('Content-Length', len(body))
     send_headers(request)

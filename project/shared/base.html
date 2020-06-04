@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>
+    <title id="title" data-title="WebChat">
         <% title = base_vars.get('title', 'Title') %>
         <%= title %>
     </title>
@@ -20,33 +20,34 @@
     <button class="nav-toggle" id="nav-toggle_id">
         <i class="fas fa-bars"></i>
     </button>
-    <a href="/" class="logo">WebChat</a>
+    <a href="/" class="logo" data-link="ajax">WebChat</a>
     <div class="sub_headers" id="myheader">
         <nav class="header-left">
-            <a href="/chat/groupchats">chats</a>
-            <a href="/chat/createchat">createchat</a>
+            <a href="/chat/groupchats" data-link="ajax">chats</a>
+            <a href="/chat/createchat" data-link="ajax">createchat</a>
         </nav>
-        <nav class="header-right">
+        <nav class="header-right" id="nav_header_right">
             <% if request.auth_is: %>
                 <% user = request.auth_get_user(none='') %>
-                <a class="/*active*/" href="/auth/manage/">
+                <a class="/*active*/" href="/auth/manage/" data-link="ajax">
                     Hello <%= user.nickname %>
                 </a>
                 <a href="/auth/logout">LogOut</a>
             <% end %>
             <% else: %>
-                <a href="/auth/register">Register</a>
-                <a href="/auth/login">Login</a>
+                <a href="/auth/register" data-link="ajax">Register</a>
+                <a href="/auth/login" data-link="ajax">Login</a>
             <% end %>
         </nav>
     </div>
 </header>
 
-<main>
+<main id="main_dynamic">
     <%= body %>
 
 </main>
 
+<script src="<%= link_for('js/chat.js') %>"></script>
 <script src="<%= link_for('js/MyJS.js') %>"></script>
 </body>
 </html>

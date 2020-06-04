@@ -1,13 +1,12 @@
-<% base = 'shared/base.html' %>
 
 <div class="login-page">
-    <form class="register-form" action="/auth/register" enctype="multipart/form-data" method="post">
+    <form class="register-form" id="register_form" action="/auth/register" enctype="multipart/form-data" method="post">
         <input type="text" required name="login" placeholder="login"/>
         <input type="password" required name="password" placeholder="password"/>
         <input type="text" required name="nickname" placeholder="user name"/>
         <input type="file" name="photodata" accept="image/*,image/jpeg">
         <input type="submit" value="create">
-        <p class="message">Already registered? <a href="/auth/login">Sign In</a></p>
-        <p><strong><%= message %></strong></p>
+        <p class="message">Already registered? <a href="/auth/login" data-link="ajax">Sign In</a></p>
+        <p><strong id="message_box"><%= message %></strong></p>
     </form>
 </div>

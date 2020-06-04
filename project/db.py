@@ -136,17 +136,17 @@ def create_session(id_user, hash, when):
 
 # ======================================================
 
-def create_message(chat_id, user_id, when, text):
+def create_message(chat_id, user_id, when, text, is_sticker):
     with connection.cursor() as cursor:
         with lock:
-            cursor.execute("INSERT INTO messages (chat_id, users_id, `when`, text) VALUES (%s, %s, %s, %s);",
-                           (chat_id, user_id, when, text))
+            cursor.execute("INSERT INTO messages (chat_id, users_id, `when`, text, is_sticker) VALUES (%s, %s, %s, %s, %s);",
+                           (chat_id, user_id, when, text, int(is_sticker)))
             connection.commit()
             return cursor.lastrowid
 
 
 def get_messages(chat_id, limit=''):
-    messages_ref = select_rows('messages', columns='id, chat_id, users_id, `when`, text',
+    messages_ref = select_rows('messages', columns='id, chat_id, users_id, `when`, text, is_sticker',
                                where='WHERE chat_id=%s' % chat_id, limit=limit)
     if messages_ref and messages_ref[1]:
         return list(map(lambda m: Message(*m), messages_ref[1]))
@@ -258,6 +258,23 @@ def add_user_to_chat(chat_id, user_id):
             connection.commit()
             chat_id = cursor.lastrowid
             return chat_id
+
+
+def delete_messages_from_chat(chat_id, id_list):
+    str_where = convert_args_to_querystr(' OR ', query=id_list, key='id')
+    str_where = f"chat_id = {chat_id} AND {str_where}"
+    execute(f"""
+    DELETE FROM messages
+    WHERE {str_where}
+    """)
+
+
+def edit_message_from_chat(chat_id, message_id, text):
+    execute(f"""
+UPDATE messages 
+SET `text` = "{text}"
+WHERE chat_id = {chat_id} AND id = {message_id};
+    """)
 
 
 # ======================================================

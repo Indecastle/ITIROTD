@@ -8,11 +8,11 @@ from chat_websocket import update_chat_user
 
 
 @route('auth/manage/',
-       'auth/manage/index/', authorize=Authorize([UserRole.USER]))
+       'auth/manage/index/', authorize=Authorize([UserRole.USER]), ajax=True)
 def manage_index(request, **kwargs):
     user = request.auth_get_user()
     kwargs.setdefault('user', user)
-    return render_template(request, 'templates/auth/manage/index.html', **kwargs)
+    return render_template(request, 'templates/auth/manage/index.html', kwargs=kwargs)
 
 
 @route('auth/manage/change_profile', method=Method.POST, authorize=Authorize())
@@ -31,10 +31,10 @@ def manage_index_POST(request):
     return redirect_to(request, '/auth/manage/index/')
 
 
-@route('auth/manage/edit_password', authorize=Authorize())
+@route('auth/manage/edit_password', authorize=Authorize(), ajax=True)
 def manage_edit_password(request, **kwargs):
     kwargs.setdefault('message', '')
-    return render_template(request, 'templates/auth/manage/edit_password.html', **kwargs)
+    return render_template(request, 'templates/auth/manage/edit_password.html', kwargs=kwargs)
 
 
 @route('auth/manage/edit_password', method=Method.POST, authorize=Authorize())
@@ -47,7 +47,7 @@ def manage_edit_password_POST(request, **kwargs):
     if not old_password or not new_password or not confirm_password or \
             new_password != confirm_password or not equal_passhash(user.password, old_password):
         kwargs.setdefault('message', 'bad password')
-        return render_template(request, 'templates/auth/manage/edit_password.html', **kwargs)
+        return render_template(request, 'templates/auth/manage/edit_password.html', kwargs=kwargss)
     pass_hex = convert_pass_to_passhash(new_password)
     db.update_user(user.id, password=pass_hex)
     return redirect_to(request, '/auth/manage/index/')

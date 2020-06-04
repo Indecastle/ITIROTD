@@ -50,3 +50,11 @@ WHERE chat.id not in (
 	INNER JOIN chat on chat_has_users.chat_id = chat.id
 	WHERE users_id=1)
     AND chat.name LIKE "%%" LIMIT 1000;
+    
+
+DELETE FROM messages
+WHERE chat_id = 2 AND (id = '1' OR id = '2' OR id = '3');
+
+UPDATE messages 
+SET `text` = 'kek123'
+WHERE id = 3;

@@ -61,9 +61,12 @@ def equal_passhash(valid_byte_pass, password):
     return valid_key == key
 
 
-def convert_args_to_querystr(joinstr, query, is_str=True):
+def convert_args_to_querystr(joinstr, query, is_str=True, key=None):
     convert_value = lambda value: f'"{value}"' if is_str else value
-    return joinstr.join([f'{key}={convert_value(value)}' for key, value in query.items()])
+    if key is None:
+        return joinstr.join([f'{key}={convert_value(value)}' for key, value in query.items()])
+    else:
+        return joinstr.join([f'{key}={convert_value(value)}' for value in query])
 
 
 def save_photo(photodata):

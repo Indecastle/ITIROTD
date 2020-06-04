@@ -20,6 +20,7 @@ def create_session(request, login, user_id):
         request.response.send_cookie('SessionHash', hash)
         request.response.send_cookie('user_id', user_id)
         request.response.send_cookie('login', login)
+    return hash, user_id
 
 
 def delete_session(request):

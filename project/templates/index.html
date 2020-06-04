@@ -1,6 +1,3 @@
-<% base = 'shared/base.html' %>
-<% base_vars['title'] = 'Index Title' %>
-
 
 <div class="container2">
     <div class="col-md-9">
@@ -8,9 +5,9 @@
     </div>
     <% if not request.auth_is: %>
         <div class="col-md-3">
-            <a href="/auth/login" class="index-btn index-block index-teal">login</a>
+            <a href="/auth/login" class="index-btn index-block index-teal" data-link="ajax">login</a>
             <br>
-            <a href="/auth/register" class="index-btn index-block index-blue">register</a>
+            <a href="/auth/register" class="index-btn index-block index-blue" data-link="ajax">register</a>
         </div>
     <% end %>
 

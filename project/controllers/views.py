@@ -7,17 +7,17 @@ from helper import save_photo
 from error import my_error
 
 
-@route('/', '/index')
+@route('/', '/index', ajax=True)
 def index(request):
     request.response.headers['kek'] = 'lol'
     kwargs = {'time': time, 'debug_start_time': time.time()}
-    return render_template(request, 'templates/index.html', **kwargs)
+    return render_template(request, 'templates/index.html', kwargs=kwargs)
 
 
 @route('/blog')
 def blog(request):
     kwargs = {'filepath': 'static/sun.ico'}
-    return render_template(request, 'templates/blog.html', **kwargs)
+    return render_template(request, 'templates/blog.html', kwargs=kwargs)
 
 
 @route('/blog', method=Method.POST)
@@ -43,4 +43,4 @@ def blog_POST(request):
 
     kwargs = {'filepath': photopath}
 
-    return render_template(request, 'templates/blog.html', **kwargs)
+    return render_template(request, 'templates/blog.html', kwargs=kwargs)
