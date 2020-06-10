@@ -55,6 +55,10 @@ function init_chat_2() {
         }
     };
 
+    function render_count_messages() {
+        already_messages.innerHTML = all_messages.length + " messages";
+    }
+
     function render_message(message, user, is_new_message = false, uuid = 'invalid') {
         let div1 = document.querySelector('#new_message_' + uuid);
         if (div1 !== null) {
@@ -154,8 +158,7 @@ function init_chat_2() {
 
             if (is_bottom || is_new_message)
                 parent_chat_list.scrollTop = parent_chat_list.scrollHeight;
-            already_messages.innerHTML = all_messages.length + " messages";
-
+            render_count_messages();
         }
     }
 
@@ -272,6 +275,7 @@ function init_chat_2() {
 
         }
         set_classes_in_header_buttons();
+        render_count_messages();
     }
 
     function action_edit_message(message_id, text) {

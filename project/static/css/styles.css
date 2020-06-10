@@ -79,7 +79,7 @@ main {
 }
 
 .chat-box .input-search-box {
-    padding: 5px 10px;
+    padding: 10px 10px;
     width: 185px;
     float: left;
 }
@@ -106,7 +106,7 @@ main {
 }
 
 .chat-box .list-users {
-    padding-left: 15px;
+    padding: 3px 0 0 10px;
     width: 165px;
     /*background-color: #9ebda0;*/
     flex: 1;
@@ -135,7 +135,7 @@ main {
 }
 
 .list-users li .chat-online, .chat-offline, .chat-me {
-    margin-right: 3px;
+    margin: 0 3px;
     font-size: 10px;
 }
 
