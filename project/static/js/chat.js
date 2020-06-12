@@ -36,7 +36,7 @@ function init_chat_2() {
         span_is_reading = document.querySelector('#form_isreading'),
         already_messages = document.querySelector('#already_messages'),
         chat_header = document.querySelector('#chat_header'),
-        websocket = new WebSocket("ws://localhost:6789/"),
+        websocket = new WebSocket("wss://localhost:6789/"),
         all_messages = [],
         data_stickers = [],
         online_users = [],
