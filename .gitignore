@@ -3,3 +3,4 @@
 *.pyc
 .idea/
 project/static/other/
+project/static/js/config.js
