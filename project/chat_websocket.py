@@ -153,7 +153,7 @@ class SessionChat:
             await self.websocket_send(json_encoded)
 
     async def action_send_message(self, data, user_info):
-        await asyncio.sleep(0.5)
+        # await asyncio.sleep(0.5)
         await self.action_window_onfocus(None, user_info)
         user = user_info.user
         text = data['text']

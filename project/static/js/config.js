@@ -1,0 +1,1 @@
+_CHAT_WEBSOCKET_URL = "ws://localhost:6789";

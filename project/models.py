@@ -16,7 +16,7 @@ class Authorize:
 
 
 class User:
-    def __init__(self, id, login, password, nickname, photopath, email, roles=None):
+    def __init__(self, id, login, password, nickname, photopath, email, name1=None, name2=None, name3=None, roles=None):
         if not roles:
             roles = {UserRole.USER}
         self.id = id
@@ -25,6 +25,9 @@ class User:
         self.nickname = nickname
         self.email = email
         self.photopath = photopath
+        self.name1 = name1
+        self.name2 = name2
+        self.name3 = name3
         self.roles = set(roles)
 
         self.is_reading = False
