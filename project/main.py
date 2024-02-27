@@ -119,7 +119,7 @@ class Response:
         self.headers[key].append(value)
 
     def send_cookie(self, key, value, path='/'):
-        self.send_header('Set-Cookie', f"{key}={value}; path={path}; expires=Thu, 01 Jan 2022 00:00:00 GMT")
+        self.send_header('Set-Cookie', f"{key}={value}; path={path}; expires=Thu, 01 Jan 2050 00:00:00 GMT")
 
     def remove_cookie(self, key):  # Set-Cookie: token=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT
         self.send_header('Set-Cookie', f"{key}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")

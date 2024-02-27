@@ -1,0 +1,46 @@
+version: "3"
+services:
+  mysql:
+    image: mysql/mysql-server:8.0.23
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: fb123456
+      MYSQL_DATABASE: ITIROTD
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userPassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./mysql/migrate.sql:/docker-entrypoint-initdb.d/1.sql"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "-u$$MYSQL_USER",
+          "-p$$MYSQL_PASSWORD",
+          "ping",
+          "-h",
+          "localhost",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  app:
+    build: ./project
+    ports:
+      - "0.0.0.0:5193:443"
+      - "0.0.0.0:6789:6789"
+    environment:
+      server_host: localhost:5193
+      server_database_host: mysql
+      server_database_port: 3306
+      server_database_username: user
+      server_database_password: userPassword
+      server_cert_pem_path: /usr/src/app/cert.pem
+      server_key_pem_path: /usr/src/app/key.pem
+      WAIT_HOSTS: mysql:3306
+    depends_on:
+      mysql:
+        condition: service_healthy
