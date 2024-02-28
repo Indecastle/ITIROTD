@@ -11,4 +11,7 @@ RUN openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -da
 
 COPY . .
 
+EXPOSE 80
+EXPOSE 6789
+
 CMD /wait && python -u ./main.py

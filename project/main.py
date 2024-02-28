@@ -232,18 +232,19 @@ def run():
     start_asyncio()
 
     def start_http_server():
-        server = ThreadingSimpleServer(config.SOCKET_HTTP, RedirectCustomServer)
+        server = ThreadingSimpleServer(config.SOCKET_HTTP, CustomServer)
         server.serve_forever()
 
-    chat_service = threading.Thread(target=start_http_server)
-    chat_service.start()
+    start_http_server()
+    # chat_service = threading.Thread(target=start_http_server)
+    # chat_service.start()
 
-    server2 = ThreadingSimpleServer(config.SOCKET_HTTPS, CustomServer)
-    server2.socket = ssl.wrap_socket(server2.socket, 
-                                     certfile=config.SSL_CERT_PEM_PATH,
-                                     keyfile=config.SSL_KEY_PEM_PATH,
-                                     server_side=True)
-    server2.serve_forever()
+    # server2 = ThreadingSimpleServer(config.SOCKET_HTTPS, CustomServer)
+    # server2.socket = ssl.wrap_socket(server2.socket, 
+    #                                  certfile=config.SSL_CERT_PEM_PATH,
+    #                                  keyfile=config.SSL_KEY_PEM_PATH,
+    #                                  server_side=True)
+    # server2.serve_forever()
 
 
 print("Run Server...")

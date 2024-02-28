@@ -1,1 +1,1 @@
-_CHAT_WEBSOCKET_URL = `wss://${location.hostname}:6789`;
+_CHAT_WEBSOCKET_URL = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/`;

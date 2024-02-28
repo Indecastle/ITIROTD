@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 services:
   mysql:
     image: mysql/mysql-server:8.0.23
@@ -29,11 +29,8 @@ services:
       retries: 40
   app:
     build: ./project
-    ports:
-      - "0.0.0.0:5193:443"
-      - "0.0.0.0:6789:6789"
     environment:
-      server_host: localhost:5193
+      server_host: localhost:80
       server_database_host: mysql
       server_database_port: 3306
       server_database_username: user
@@ -44,3 +41,11 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+  nginx:
+    build: nginx/
+    ports:
+      - 8080:80
+    environment:
+      - NGINX_PORT=80
+    depends_on:
+      - app
